@@ -30,7 +30,7 @@ public class PremergeRunner extends BuildServiceAdapter {
 
   @NotNull
   protected String getScript() {
-    final String commandContent = "git log --graph --all";
+    final String commandContent = "git fetch origin premerge/new_merge7/to/master\ngit checkout premerge/new_merge7/to/master ";
     try {
       final File scriptFile = File.createTempFile("premerge_script", "", getAgentTempDirectory());
       FileUtil.writeFile(scriptFile, commandContent, Charset.defaultCharset());
@@ -38,7 +38,7 @@ public class PremergeRunner extends BuildServiceAdapter {
 
       return scriptFile.getAbsolutePath();
     } catch (IOException e) {
-      e.printStackTrace(); //todo
+      e.printStackTrace(); //todo normal exception
       return null;
     }
   }

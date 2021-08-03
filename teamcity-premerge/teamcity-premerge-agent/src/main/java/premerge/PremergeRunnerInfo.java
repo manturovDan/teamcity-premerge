@@ -8,7 +8,7 @@ public class PremergeRunnerInfo implements AgentBuildRunnerInfo {
   @NotNull
   @Override
   public String getType() {
-    return "premergeRunner";
+    return PremergeConstants.TYPE;
   }
 
   @Override
