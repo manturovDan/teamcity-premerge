@@ -16,18 +16,15 @@ public class PremergeRunnerFactory implements CommandLineBuildServiceFactory, Ag
   private final GitAgentSSHService mySshService;
   private final PluginConfigFactory myConfigFactory;
   private final MirrorManager myMirrorManager;
-  private final AgentPluginConfig myPluginConfig;
 
   public PremergeRunnerFactory(@NotNull GitMetaFactory gitMetaFactory,
                                @NotNull GitAgentSSHService sshService,
                                @NotNull PluginConfigFactory configFactory,
-                               @NotNull MirrorManager mirrorManager
-                               /*@NotNull AgentPluginConfig pluginConfig*/) {
+                               @NotNull MirrorManager mirrorManager) {
     myGitMetaFactory = gitMetaFactory;
     mySshService = sshService;
     myConfigFactory = configFactory;
     myMirrorManager = mirrorManager;
-    myPluginConfig = null;
   }
 
   @NotNull
@@ -44,7 +41,7 @@ public class PremergeRunnerFactory implements CommandLineBuildServiceFactory, Ag
   @NotNull
   @Override
   public CommandLineBuildService createService() {
-    return new PremergeRunner(myConfigFactory, mySshService, myGitMetaFactory, myMirrorManager, myPluginConfig);
+    return new PremergeRunner(myConfigFactory, mySshService, myGitMetaFactory, myMirrorManager);
   }
 
   @NotNull

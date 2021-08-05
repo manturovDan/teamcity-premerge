@@ -25,19 +25,16 @@ public class PremergeRunner extends BuildServiceAdapter {
   private final GitAgentSSHService mySshService;
   private final GitMetaFactory myGitMetaFactory;
   private final MirrorManager myMirrorManager;
-  private final AgentPluginConfig myPluginConfig;
 
 
   public PremergeRunner(@NotNull PluginConfigFactory configFactory,
                         @NotNull GitAgentSSHService sshService,
                         @NotNull GitMetaFactory gitMetaFactory,
-                        @NotNull MirrorManager mirrorManager,
-                        AgentPluginConfig pluginConfig) {
+                        @NotNull MirrorManager mirrorManager) {
     myConfigFactory = configFactory;
     mySshService = sshService;
     myGitMetaFactory = gitMetaFactory;
     myMirrorManager = mirrorManager;
-    myPluginConfig = pluginConfig;
   }
 
 
@@ -78,10 +75,10 @@ public class PremergeRunner extends BuildServiceAdapter {
       AgentGitVcsRoot vcsRoot = new AgentGitVcsRoot(myMirrorManager, build.getCheckoutDirectory(), root);
       facade.fetch()
             .setAuthSettings(vcsRoot.getAuthSettings())
-            .setUseNativeSsh(false)
+            .setUseNativeSsh(config.isUseNativeSSH())
             .setTimeout(10)
-            .setRefspec("+untagged:untagged")
-            .setFetchTags(false)
+            .setRefspec("+untagged2:untagged2")
+            .setFetchTags(config.isFetchTags())
             .setQuite(true)
             .call();
 
