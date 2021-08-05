@@ -6,6 +6,9 @@
     <groupId>org.jetbrains.teamcity</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
+  <properties>
+    <teamcity.path.lib>${project.basedir}/../../../.idea_artifacts/agent_plugin_git/git-agent/lib/</teamcity.path.lib>
+  </properties>
   <artifactId>teamcity-premerge-agent</artifactId>
   <packaging>jar</packaging>
   <dependencies>

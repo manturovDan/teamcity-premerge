@@ -72,7 +72,7 @@ public class PremergeRunType extends RunType {
   @Nullable
   @Override
   public String getViewRunnerParamsJspFilePath() {
-    return myPluginDescriptor.getPluginResourcesPath("premergeParams.jsp");
+    return null;
   }
 
   @Nullable
