@@ -4,6 +4,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
        default-autowire="constructor">
-  <bean id="premergeBuildProcess" class="premerge.PremergeBuildProcess"></bean>
   <bean id="premergeBuildRunner" class="premerge.PremergeBuildRunner"></bean>
+  <bean id="gitMetaFactory" class="jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactoryImpl"/>
+  <bean id="gitAgentSshService" class="jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService" />
+  <bean id="configFactory" class="jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactoryImpl"/>
+  <bean id="mirrorManager" class="jetbrains.buildServer.buildTriggers.vcs.git.MirrorManagerImpl"></bean>
+  <!--<bean id="agentRunningBuild" class="jetbrains.buildServer.agent.AgentRunningBuild"></bean>-->
 </beans>

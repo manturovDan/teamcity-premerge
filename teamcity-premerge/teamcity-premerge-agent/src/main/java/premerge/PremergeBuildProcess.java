@@ -36,6 +36,12 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @Override
   public void start() throws RunBuildException {
     System.out.println("Build process run");
+    try {
+      preliminaryMergeTmp();
+    }
+    catch (VcsException vcsException) {
+      vcsException.printStackTrace();
+    }
   }
 
   protected void preliminaryMergeTmp() throws VcsException {
@@ -62,7 +68,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
             .setAuthSettings(vcsRoot.getAuthSettings())
             .setUseNativeSsh(config.isUseNativeSSH())
             .setTimeout(timeout)
-            .setRefspec("+untagged2:untagged2")
+            .setRefspec("+untagged4:untagged4")
             .setFetchTags(config.isFetchTags())
             .setQuite(true)
             .call();
@@ -93,6 +99,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull
   @Override
   public BuildFinishedStatus waitFor() throws RunBuildException {
+    System.out.println("Finished");
     return BuildFinishedStatus.FINISHED_SUCCESS;
   }
 }

@@ -13,24 +13,24 @@ public class PremergeBuildRunner implements AgentBuildRunner, AgentBuildRunnerIn
   @NotNull private final GitAgentSSHService mySshService;
   @NotNull private final PluginConfigFactory myConfigFactory;
   @NotNull private final MirrorManager myMirrorManager;
-  @NotNull private final AgentRunningBuild myBuild;
+  //@NotNull private final AgentRunningBuild myBuild;
 
   public PremergeBuildRunner(@NotNull GitMetaFactory gitMetaFactory,
                              @NotNull GitAgentSSHService sshService,
                              @NotNull PluginConfigFactory configFactory,
-                             @NotNull MirrorManager mirrorManager,
-                             @NotNull AgentRunningBuild build) {
+                             @NotNull MirrorManager mirrorManager/*,
+                             @NotNull AgentRunningBuild build*/) {
     myGitMetaFactory = gitMetaFactory;
     mySshService = sshService;
     myConfigFactory = configFactory;
     myMirrorManager = mirrorManager;
-    myBuild = build;
+    //myBuild = build;
   }
 
   @NotNull
   @Override
   public BuildProcess createBuildProcess(@NotNull AgentRunningBuild runningBuild, @NotNull BuildRunnerContext context) throws RunBuildException {
-    return new PremergeBuildProcess(myConfigFactory, mySshService, myGitMetaFactory, myMirrorManager, myBuild);
+    return new PremergeBuildProcess(myConfigFactory, mySshService, myGitMetaFactory, myMirrorManager, runningBuild);
   }
 
   @NotNull
