@@ -13,18 +13,15 @@ public class PremergeBuildRunner implements AgentBuildRunner, AgentBuildRunnerIn
   @NotNull private final GitAgentSSHService mySshService;
   @NotNull private final PluginConfigFactory myConfigFactory;
   @NotNull private final MirrorManager myMirrorManager;
-  //@NotNull private final AgentRunningBuild myBuild;
 
   public PremergeBuildRunner(@NotNull GitMetaFactory gitMetaFactory,
                              @NotNull GitAgentSSHService sshService,
                              @NotNull PluginConfigFactory configFactory,
-                             @NotNull MirrorManager mirrorManager/*,
-                             @NotNull AgentRunningBuild build*/) {
+                             @NotNull MirrorManager mirrorManager) {
     myGitMetaFactory = gitMetaFactory;
     mySshService = sshService;
     myConfigFactory = configFactory;
     myMirrorManager = mirrorManager;
-    //myBuild = build;
   }
 
   @NotNull
