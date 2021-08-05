@@ -9,5 +9,4 @@
   <bean id="gitAgentSshService" class="jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService" />
   <bean id="configFactory" class="jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactoryImpl"/>
   <bean id="mirrorManager" class="jetbrains.buildServer.buildTriggers.vcs.git.MirrorManagerImpl"></bean>
-  <!--<bean id="agentRunningBuild" class="jetbrains.buildServer.agent.AgentRunningBuild"></bean>-->
 </beans>

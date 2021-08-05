@@ -6,6 +6,7 @@ import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildProcessAdapter;
+import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
@@ -20,17 +21,20 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final GitMetaFactory myGitMetaFactory;
   @NotNull private final MirrorManager myMirrorManager;
   @NotNull private final AgentRunningBuild myBuild;
+  @NotNull private final BuildRunnerContext myRunner;
 
   public PremergeBuildProcess(@NotNull PluginConfigFactory configFactory,
                               @NotNull GitAgentSSHService sshService,
                               @NotNull GitMetaFactory gitMetaFactory,
                               @NotNull MirrorManager mirrorManager,
-                              @NotNull AgentRunningBuild build) {
+                              @NotNull AgentRunningBuild build,
+                              @NotNull BuildRunnerContext runner) {
     myConfigFactory = configFactory;
     mySshService = sshService;
     myGitMetaFactory = gitMetaFactory;
     myMirrorManager = mirrorManager;
     myBuild = build;
+    myRunner = runner;
   }
 
   @Override
@@ -38,10 +42,25 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     System.out.println("Build process run");
     myBuild.getBuildLogger().message("Write to log");
     try {
-      preliminaryMergeTmp();
+      preliminaryMerge();
+      //preliminaryMergeTmp();
     }
     catch (VcsException vcsException) {
       vcsException.printStackTrace();
+    }
+  }
+
+  protected void preliminaryMerge() throws VcsException {
+    for (VcsRootEntry entry : myBuild.getVcsRootEntries()) {
+      VcsRoot root = entry.getVcsRoot();
+      AgentGitVcsRoot gitRoot = new AgentGitVcsRoot(myMirrorManager, myBuild.getCheckoutDirectory(), root);
+
+
+      AgentPluginConfig config = myConfigFactory.createConfig(myBuild, root);
+      Map<String, String> env = getGitCommandEnv(config, myBuild);
+      GitFactory gitFactory = myGitMetaFactory.createFactory(mySshService, config, getLogger(myBuild, config), myBuild.getBuildTempDirectory(), env, new BuildContext(myBuild, config));
+      GitFacade facade = gitFactory.create(myBuild.getCheckoutDirectory());
+      System.out.println(facade.revParse().setRef("HEAD").setParams("--abbrev-ref").call());
     }
   }
 
