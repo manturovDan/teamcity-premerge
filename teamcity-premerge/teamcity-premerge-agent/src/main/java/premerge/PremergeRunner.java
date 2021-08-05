@@ -10,6 +10,7 @@ import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.agent.runner.SimpleProgramCommandLine;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVcsRoot;
+import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
 import jetbrains.buildServer.util.FileUtil;
@@ -71,12 +72,16 @@ public class PremergeRunner extends BuildServiceAdapter {
       //      .setStartPoint("master")
       //      .call();
 
-      //todo upd
+      int timeout = config.getIdleTimeoutSeconds();
+      GitVersion version = config.getGitVersion();
+      if(version.isLessThan(new GitVersion(1, 7, 1, 0))) {
+        timeout = 24 * 60 * 60; //24 hours
+      }
       AgentGitVcsRoot vcsRoot = new AgentGitVcsRoot(myMirrorManager, build.getCheckoutDirectory(), root);
       facade.fetch()
             .setAuthSettings(vcsRoot.getAuthSettings())
             .setUseNativeSsh(config.isUseNativeSSH())
-            .setTimeout(10)
+            .setTimeout(timeout)
             .setRefspec("+untagged2:untagged2")
             .setFetchTags(config.isFetchTags())
             .setQuite(true)
@@ -90,6 +95,8 @@ public class PremergeRunner extends BuildServiceAdapter {
     //      .setStartPoint("master")
     //      .call();
   }
+
+
 
   @NotNull
   private Map<String, String> getGitCommandEnv(@NotNull AgentPluginConfig config, @NotNull AgentRunningBuild build) {
