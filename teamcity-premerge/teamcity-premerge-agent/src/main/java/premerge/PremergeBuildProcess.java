@@ -36,6 +36,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @Override
   public void start() throws RunBuildException {
     System.out.println("Build process run");
+    myBuild.getBuildLogger().message("Write to log");
     try {
       preliminaryMergeTmp();
     }
