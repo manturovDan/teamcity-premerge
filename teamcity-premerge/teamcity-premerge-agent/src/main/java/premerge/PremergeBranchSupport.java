@@ -51,7 +51,7 @@ public class PremergeBranchSupport {
 
   @NotNull
   public String constructName() {
-    return PremergeConstants.PRELIMINARY_MERGE_BRANCH_PREFIX + "/" + myProcess.getRunner().getConfigParameters().get(PremergeConstants.TARGET_BRANCH);
+    return PremergeConstants.PRELIMINARY_MERGE_BRANCH_PREFIX + "/" + myProcess.getBuild().getBuildId();
   }
 
   @NotNull
@@ -71,17 +71,38 @@ public class PremergeBranchSupport {
     return currentBranch;
   }
 
-  public void fetch(String branch) throws VcsException {
+  public void fetch(String branch) {
     String logicalBranch = getLogicalName(branch);
 
-    myFacade.fetch()
-            .setAuthSettings(myVcsRoot.getAuthSettings())
-            .setUseNativeSsh(myConfig.isUseNativeSSH())
-            .setTimeout(getTimeout())
-            .setRefspec("+" + logicalBranch + ":" + logicalBranch)
-            .setFetchTags(myConfig.isFetchTags())
-            .setQuite(true)
-            .call();
+    try {
+      myFacade.fetch()
+              .setAuthSettings(myVcsRoot.getAuthSettings())
+              .setUseNativeSsh(myConfig.isUseNativeSSH())
+              .setTimeout(getTimeout())
+              .setRefspec("+" + logicalBranch + ":" + logicalBranch)
+              .setFetchTags(myConfig.isFetchTags())
+              .setQuite(true)
+              .call();
+    } catch (VcsException e) {
+      myProcess.getBuild().getBuildLogger().error("Fetching '" + branch + "' error");
+      myProcess.setUnsuccess();
+    }
+
+    myProcess.getBuild().getBuildLogger().message("'" + branch + "' fetched");
+  }
+
+  public void createBranch(String branch, String startPoint) {
+    try {
+      myFacade.createBranch()
+              .setName(branch)
+              .setStartPoint(getLogicalName(startPoint))
+              .call();
+    } catch (VcsException e) {
+      myProcess.getBuild().getBuildLogger().error("Creating '" + branch + "' from '" + startPoint + "' error");
+      myProcess.setUnsuccess();
+    }
+
+    myProcess.getBuild().getBuildLogger().message("Created '" + branch + "' from '" + startPoint + "'");
   }
 
   public int getTimeout() {

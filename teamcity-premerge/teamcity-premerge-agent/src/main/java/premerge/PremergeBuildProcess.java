@@ -19,6 +19,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final MirrorManager myMirrorManager;
   @NotNull private final AgentRunningBuild myBuild;
   @NotNull private final BuildRunnerContext myRunner;
+  private boolean success = true;
 
   public PremergeBuildProcess(@NotNull PluginConfigFactory configFactory,
                               @NotNull GitAgentSSHService sshService,
@@ -32,36 +33,6 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     myMirrorManager = mirrorManager;
     myBuild = build;
     myRunner = runner;
-  }
-
-  @NotNull
-  PluginConfigFactory getConfigFactory() {
-    return myConfigFactory;
-  }
-
-  @NotNull
-  GitAgentSSHService getSshService() {
-    return mySshService;
-  }
-
-  @NotNull
-  GitMetaFactory getGitMetaFactory() {
-    return myGitMetaFactory;
-  }
-
-  @NotNull
-  MirrorManager getMirrorManager() {
-    return myMirrorManager;
-  }
-
-  @NotNull
-  AgentRunningBuild getBuild() {
-    return myBuild;
-  }
-
-  @NotNull
-  BuildRunnerContext getRunner() {
-    return myRunner;
   }
 
   @Override
@@ -82,7 +53,8 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       VcsRoot root = entry.getVcsRoot();
       PremergeBranchSupport branchSupport = new PremergeBranchSupport(this, root);
 
-      branchSupport.fetch("untegged10");
+      branchSupport.fetch(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
+      branchSupport.createBranch(branchSupport.constructName(), branchSupport.getCurrentBranchName());
     }
   }
 
@@ -129,5 +101,43 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   public BuildFinishedStatus waitFor() throws RunBuildException {
     System.out.println("Finished");
     return BuildFinishedStatus.FINISHED_SUCCESS;
+  }
+
+  @NotNull
+  PluginConfigFactory getConfigFactory() {
+    return myConfigFactory;
+  }
+
+  @NotNull
+  GitAgentSSHService getSshService() {
+    return mySshService;
+  }
+
+  @NotNull
+  GitMetaFactory getGitMetaFactory() {
+    return myGitMetaFactory;
+  }
+
+  @NotNull
+  MirrorManager getMirrorManager() {
+    return myMirrorManager;
+  }
+
+  @NotNull
+  AgentRunningBuild getBuild() {
+    return myBuild;
+  }
+
+  @NotNull
+  BuildRunnerContext getRunner() {
+    return myRunner;
+  }
+
+  boolean getSuccess() {
+    return success;
+  }
+
+  void setUnsuccess() {
+    success = false;
   }
 }
