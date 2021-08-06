@@ -93,7 +93,6 @@ public class PremergeBranchSupport {
       myProcess.setUnsuccess();
       return;
     }
-
     myProcess.getBuild().getBuildLogger().message("'" + branch + "' fetched");
   }
 
@@ -110,9 +109,7 @@ public class PremergeBranchSupport {
       myProcess.setUnsuccess();
       return;
     }
-
     myProcess.getBuild().getBuildLogger().message("Checkout to '" + branch + "'");
-
   }
 
   public void createBranch(String branch, String startPoint) {
@@ -126,8 +123,20 @@ public class PremergeBranchSupport {
       myProcess.setUnsuccess();
       return;
     }
-
     myProcess.getBuild().getBuildLogger().message("Created '" + branch + "' from '" + startPoint + "'");
+  }
+
+  public void merge(String branch) {
+    try {
+      myFacade.merge()
+              .setBranches(getLogicalName(branch))
+              .call();
+    } catch (Exception e) {
+      myProcess.getBuild().getBuildLogger().error("Merging '" + branch +"' error");
+      myProcess.setUnsuccess();
+      return;
+    }
+    myProcess.getBuild().getBuildLogger().message("'" + branch + "' was merged");
   }
 
   public int getTimeout() {
