@@ -1,13 +1,10 @@
 package premerge;
 
-import java.util.HashMap;
-import java.util.Map;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildProcessAdapter;
 import jetbrains.buildServer.agent.BuildRunnerContext;
-import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
 import jetbrains.buildServer.vcs.VcsException;
@@ -37,6 +34,36 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     myRunner = runner;
   }
 
+  @NotNull
+  PluginConfigFactory getConfigFactory() {
+    return myConfigFactory;
+  }
+
+  @NotNull
+  GitAgentSSHService getSshService() {
+    return mySshService;
+  }
+
+  @NotNull
+  GitMetaFactory getGitMetaFactory() {
+    return myGitMetaFactory;
+  }
+
+  @NotNull
+  MirrorManager getMirrorManager() {
+    return myMirrorManager;
+  }
+
+  @NotNull
+  AgentRunningBuild getBuild() {
+    return myBuild;
+  }
+
+  @NotNull
+  BuildRunnerContext getRunner() {
+    return myRunner;
+  }
+
   @Override
   public void start() throws RunBuildException {
     System.out.println("Build process run");
@@ -53,18 +80,13 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   protected void preliminaryMerge() throws VcsException {
     for (VcsRootEntry entry : myBuild.getVcsRootEntries()) {
       VcsRoot root = entry.getVcsRoot();
-      AgentGitVcsRoot gitRoot = new AgentGitVcsRoot(myMirrorManager, myBuild.getCheckoutDirectory(), root);
+      PremergeBranchSupport branchSupport = new PremergeBranchSupport(this, root);
 
-
-      AgentPluginConfig config = myConfigFactory.createConfig(myBuild, root);
-      Map<String, String> env = getGitCommandEnv(config, myBuild);
-      GitFactory gitFactory = myGitMetaFactory.createFactory(mySshService, config, getLogger(myBuild, config), myBuild.getBuildTempDirectory(), env, new BuildContext(myBuild, config));
-      GitFacade facade = gitFactory.create(myBuild.getCheckoutDirectory());
-      System.out.println(facade.revParse().setRef("HEAD").setParams("--abbrev-ref").call());
+      branchSupport.fetch("untegged10");
     }
   }
 
-  protected void preliminaryMergeTmp() throws VcsException {
+  /*protected void preliminaryMergeTmp() throws VcsException {
     System.out.println(myBuild);
     for (VcsRootEntry entry : myBuild.getVcsRootEntries()) {
       VcsRoot root = entry.getVcsRoot();
@@ -100,21 +122,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     //      .setName("new_test_branch_from_master")
     //      .setStartPoint("master")
     //      .call();
-  }
-
-  @NotNull
-  private Map<String, String> getGitCommandEnv(@NotNull AgentPluginConfig config, @NotNull AgentRunningBuild build) {
-    if (config.isRunGitWithBuildEnv()) {
-      return build.getBuildParameters().getEnvironmentVariables();
-    } else {
-      return new HashMap<>(0);
-    }
-  }
-
-  @NotNull
-  private GitBuildProgressLogger getLogger(@NotNull AgentRunningBuild build, @NotNull AgentPluginConfig config) {
-    return new GitBuildProgressLogger(build.getBuildLogger().getFlowLogger("-1"), config.getGitProgressMode());
-  }
+  }*/
 
   @NotNull
   @Override

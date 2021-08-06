@@ -11,4 +11,5 @@ public class PremergeConstants {
                                            "satisfy \"Source branch filter\" and \"Target branch\" when a source branch is updated";
   public static final String SOURCE_BRANCHES_FILTER = "src.br.filter";
   public static final String TARGET_BRANCH = "tar.br";
+  public static final String PRELIMINARY_MERGE_BRANCH_PREFIX = "premerge";
 }
