@@ -64,8 +64,13 @@ public class PremergeBranchSupport {
 
   @NotNull
   public String getCurrentBranchName() throws VcsException {
-    String currentBranch = myFacade.revParse().setRef("HEAD").setParams("--abbrev-ref").call();
+    String currentBranch = myFacade.revParse()
+                                   .setRef("HEAD")
+                                   .setParams("--abbrev-ref")
+                                   .call();
     if (currentBranch == null) {
+      myProcess.getBuild().getBuildLogger().error("Smt went wrong. Current branch is null");
+      myProcess.setUnsuccess();
       throw new IllegalStateException("Current branch is null");
     }
     return currentBranch;
@@ -83,23 +88,43 @@ public class PremergeBranchSupport {
               .setFetchTags(myConfig.isFetchTags())
               .setQuite(true)
               .call();
-    } catch (VcsException e) {
+    } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Fetching '" + branch + "' error");
       myProcess.setUnsuccess();
+      return;
     }
 
     myProcess.getBuild().getBuildLogger().message("'" + branch + "' fetched");
   }
 
+  public void checkout(String branch) {
+    try {
+      myFacade.checkout()
+              .setAuthSettings(myVcsRoot.getAuthSettings())
+              .setUseNativeSsh(myConfig.isUseNativeSSH())
+              .setBranch(getLogicalName(branch))
+              .setTimeout(myConfig.getCheckoutIdleTimeoutSeconds())
+              .call();
+    } catch (Exception e) {
+      myProcess.getBuild().getBuildLogger().error("Checkout to '" + branch + "' error");
+      myProcess.setUnsuccess();
+      return;
+    }
+
+    myProcess.getBuild().getBuildLogger().message("Checkout to '" + branch + "'");
+
+  }
+
   public void createBranch(String branch, String startPoint) {
     try {
       myFacade.createBranch()
-              .setName(branch)
+              .setName(getLogicalName(branch))
               .setStartPoint(getLogicalName(startPoint))
               .call();
-    } catch (VcsException e) {
+    } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Creating '" + branch + "' from '" + startPoint + "' error");
       myProcess.setUnsuccess();
+      return;
     }
 
     myProcess.getBuild().getBuildLogger().message("Created '" + branch + "' from '" + startPoint + "'");

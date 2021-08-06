@@ -41,7 +41,6 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     myBuild.getBuildLogger().message("Write to log");
     try {
       preliminaryMerge();
-      //preliminaryMergeTmp();
     }
     catch (VcsException vcsException) {
       vcsException.printStackTrace();
@@ -53,48 +52,12 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       VcsRoot root = entry.getVcsRoot();
       PremergeBranchSupport branchSupport = new PremergeBranchSupport(this, root);
 
+      String premergeBranch = branchSupport.constructName();
       branchSupport.fetch(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
-      branchSupport.createBranch(branchSupport.constructName(), branchSupport.getCurrentBranchName());
+      branchSupport.createBranch(premergeBranch, branchSupport.getCurrentBranchName());
+      branchSupport.checkout(premergeBranch);
     }
   }
-
-  /*protected void preliminaryMergeTmp() throws VcsException {
-    System.out.println(myBuild);
-    for (VcsRootEntry entry : myBuild.getVcsRootEntries()) {
-      VcsRoot root = entry.getVcsRoot();
-
-      AgentPluginConfig config = myConfigFactory.createConfig(myBuild, root);
-      Map<String, String> env = getGitCommandEnv(config, myBuild);
-      GitFactory gitFactory = myGitMetaFactory.createFactory(mySshService, config, getLogger(myBuild, config), myBuild.getBuildTempDirectory(), env, new BuildContext(myBuild, config));
-      GitFacade facade = gitFactory.create(myBuild.getCheckoutDirectory());
-      //facade.createBranch()
-      //      .setName("new_test_branch_from_master")
-      //      .setStartPoint("master")
-      //      .call();
-
-      int timeout = config.getIdleTimeoutSeconds();
-      GitVersion version = config.getGitVersion();
-      if(version.isLessThan(new GitVersion(1, 7, 1, 0))) {
-        timeout = 24 * 60 * 60; //24 hours
-      }
-      AgentGitVcsRoot vcsRoot = new AgentGitVcsRoot(myMirrorManager, myBuild.getCheckoutDirectory(), root);
-      facade.fetch()
-            .setAuthSettings(vcsRoot.getAuthSettings())
-            .setUseNativeSsh(config.isUseNativeSSH())
-            .setTimeout(timeout)
-            .setRefspec("+untagged4:untagged4")
-            .setFetchTags(config.isFetchTags())
-            .setQuite(true)
-            .call();
-
-
-    }
-    //GitFacade facade = myGitFactory.create(getAgentTempDirectory());
-    //facade.createBranch()
-    //      .setName("new_test_branch_from_master")
-    //      .setStartPoint("master")
-    //      .call();
-  }*/
 
   @NotNull
   @Override
