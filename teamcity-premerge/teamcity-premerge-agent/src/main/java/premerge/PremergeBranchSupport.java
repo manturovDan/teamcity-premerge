@@ -76,7 +76,7 @@ public class PremergeBranchSupport {
     return currentBranch;
   }
 
-  public void fetch(String branch) {
+  public void fetch(String branch) throws VcsException {
     String logicalBranch = getLogicalName(branch);
 
     try {
@@ -91,12 +91,12 @@ public class PremergeBranchSupport {
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Fetching '" + branch + "' error");
       myProcess.setUnsuccess();
-      return;
+      throw new VcsException(e);
     }
     myProcess.getBuild().getBuildLogger().message("'" + branch + "' fetched");
   }
 
-  public void checkout(String branch) {
+  public void checkout(String branch) throws VcsException {
     try {
       myFacade.checkout()
               .setAuthSettings(myVcsRoot.getAuthSettings())
@@ -107,12 +107,12 @@ public class PremergeBranchSupport {
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Checkout to '" + branch + "' error");
       myProcess.setUnsuccess();
-      return;
+      throw new VcsException(e);
     }
     myProcess.getBuild().getBuildLogger().message("Checkout to '" + branch + "'");
   }
 
-  public void createBranch(String branch, String startPoint) {
+  public void createBranch(String branch, String startPoint) throws VcsException {
     try {
       myFacade.createBranch()
               .setName(getLogicalName(branch))
@@ -121,12 +121,12 @@ public class PremergeBranchSupport {
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Creating '" + branch + "' from '" + startPoint + "' error");
       myProcess.setUnsuccess();
-      return;
+      throw new VcsException(e);
     }
     myProcess.getBuild().getBuildLogger().message("Created '" + branch + "' from '" + startPoint + "'");
   }
 
-  public void merge(String branch) {
+  public void merge(String branch) throws VcsException {
     try {
       myFacade.merge()
               .setBranches(getLogicalName(branch))
@@ -134,7 +134,7 @@ public class PremergeBranchSupport {
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Merging '" + branch +"' error");
       myProcess.setUnsuccess();
-      return;
+      throw new VcsException(e);
     }
     myProcess.getBuild().getBuildLogger().message("'" + branch + "' was merged");
   }

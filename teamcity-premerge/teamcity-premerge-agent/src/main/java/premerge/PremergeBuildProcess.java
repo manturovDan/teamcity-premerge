@@ -36,14 +36,13 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   }
 
   @Override
-  public void start() throws RunBuildException {
-    System.out.println("Build process run");
-    myBuild.getBuildLogger().message("Write to log");
+  public void start() {
+    myBuild.getBuildLogger().message("Preliminary merge fearture:");
     try {
       preliminaryMerge();
     }
     catch (VcsException vcsException) {
-      vcsException.printStackTrace();
+      myBuild.getBuildLogger().error("Error while build step execution");
     }
   }
 
@@ -71,9 +70,13 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
 
   @NotNull
   @Override
-  public BuildFinishedStatus waitFor() throws RunBuildException {
-    System.out.println("Finished");
-    return BuildFinishedStatus.FINISHED_SUCCESS;
+  public BuildFinishedStatus waitFor() {
+    if (getSuccess()) {
+      return BuildFinishedStatus.FINISHED_SUCCESS;
+    }
+    else {
+      return BuildFinishedStatus.FINISHED_FAILED;
+    }
   }
 
   @NotNull
