@@ -41,10 +41,6 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   public void start() {
     myBuild.getBuildLogger().message("Preliminary merge fearture:");
 
-    myBuild.getSharedConfigParameters().entrySet().forEach(entry -> {
-      System.out.println(entry.getKey() + " " + entry.getValue());
-    });
-
     try {
       preliminaryMerge();
     }
@@ -54,21 +50,14 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   }
 
   protected void preliminaryMerge() throws VcsException {
-    targetBranch = PremergeBranchSupport.getLogicalName(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
+    targetBranch = PremergeBranchSupport.cutRefsHeads(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
     for (VcsRootEntry entry : myBuild.getVcsRootEntries()) {
       VcsRoot root = entry.getVcsRoot();
       PremergeBranchSupport branchSupport = new PremergeBranchSupport(this, root);
 
-      String currentBranch = PremergeBranchSupport.getLogicalName(branchSupport.getCurrentBranchName());
-
-      if (currentBranch.equals(targetBranch)) {
-        myBuild.getBuildLogger().warning("Can't make premerge of target branch '" + targetBranch + "', skip this Vcs Root");
-        continue;
-      }
-
       String premergeBranch = branchSupport.constructName();
       branchSupport.fetch(targetBranch);
-      branchSupport.createBranch(premergeBranch, currentBranch);
+      branchSupport.createBranch(premergeBranch);
       branchSupport.checkout(premergeBranch);
       branchSupport.merge(targetBranch);
 

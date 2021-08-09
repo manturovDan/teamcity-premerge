@@ -55,25 +55,11 @@ public class PremergeBranchSupport {
   }
 
   @NotNull
-  public static String getLogicalName(@NotNull String branchName) {
+  public static String cutRefsHeads(@NotNull String branchName) {
     if (branchName.startsWith("refs/heads/")) {
       return branchName.substring("refs/heads/".length());
     }
     return branchName;
-  }
-
-  @NotNull
-  public String getCurrentBranchName() throws VcsException {
-    String currentBranch = myFacade.revParse()
-                                   .setRef("HEAD")
-                                   .setParams("--abbrev-ref")
-                                   .call();
-    if (currentBranch == null) {
-      myProcess.getBuild().getBuildLogger().error("Smt went wrong. Current branch is null");
-      myProcess.setUnsuccess();
-      throw new IllegalStateException("Current branch is null");
-    }
-    return currentBranch;
   }
 
   public void fetch(String branch) throws VcsException {
@@ -110,18 +96,17 @@ public class PremergeBranchSupport {
     myProcess.getBuild().getBuildLogger().message("Checkout to '" + branch + "'");
   }
 
-  public void createBranch(String branch, String startPoint) throws VcsException {
+  public void createBranch(String branch) throws VcsException {
     try {
       myFacade.createBranch()
               .setName(branch)
-              //.setStartPoint("")
               .call();
     } catch (Exception e) {
-      myProcess.getBuild().getBuildLogger().error("Creating '" + branch + "' from '" + startPoint + "' error");
+      myProcess.getBuild().getBuildLogger().error("Creating '" + branch + "'");
       myProcess.setUnsuccess();
       throw new VcsException(e);
     }
-    myProcess.getBuild().getBuildLogger().message("Created '" + branch + "' from '" + startPoint + "'");
+    myProcess.getBuild().getBuildLogger().message("Created '" + branch + "' from '");
   }
 
   public void merge(String branch) throws VcsException {
