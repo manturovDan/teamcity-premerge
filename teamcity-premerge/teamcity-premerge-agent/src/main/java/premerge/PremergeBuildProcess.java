@@ -1,6 +1,5 @@
 package premerge;
 
-import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildProcessAdapter;
@@ -19,7 +18,10 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final MirrorManager myMirrorManager;
   @NotNull private final AgentRunningBuild myBuild;
   @NotNull private final BuildRunnerContext myRunner;
-  private boolean success = true;
+  private String targetBranch;
+  private ResultStatus status = ResultStatus.SKIPPED;
+
+  public enum ResultStatus {SUCCESS, SKIPPED, FAILED}
 
   public PremergeBuildProcess(@NotNull PluginConfigFactory configFactory,
                               @NotNull GitAgentSSHService sshService,
@@ -47,17 +49,16 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   }
 
   protected void preliminaryMerge() throws VcsException {
+    targetBranch = PremergeBranchSupport.getLogicalName(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
     for (VcsRootEntry entry : myBuild.getVcsRootEntries()) {
       VcsRoot root = entry.getVcsRoot();
       PremergeBranchSupport branchSupport = new PremergeBranchSupport(this, root);
 
-      String currentBranch = branchSupport.getCurrentBranchName();
-      String targetBranch = myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH);
+      String currentBranch = PremergeBranchSupport.getLogicalName(branchSupport.getCurrentBranchName());
 
       if (currentBranch.equals(targetBranch)) {
-        myBuild.getBuildLogger().error("Trying to make premerge of target branch '" + targetBranch + "'");
-        setUnsuccess();
-        return;
+        myBuild.getBuildLogger().warning("Can't make premerge of target branch '" + targetBranch + "', skip this Vcs Root");
+        continue;
       }
 
       String premergeBranch = branchSupport.constructName();
@@ -65,17 +66,23 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       branchSupport.createBranch(premergeBranch, currentBranch);
       branchSupport.checkout(premergeBranch);
       branchSupport.merge(targetBranch);
+
+      setSuccess();
     }
   }
 
   @NotNull
   @Override
   public BuildFinishedStatus waitFor() {
-    if (getSuccess()) {
-      return BuildFinishedStatus.FINISHED_SUCCESS;
+    if (getStatus() == ResultStatus.FAILED) {
+      return BuildFinishedStatus.FINISHED_FAILED;
     }
     else {
-      return BuildFinishedStatus.FINISHED_FAILED;
+      if (getStatus() == ResultStatus.SUCCESS) {
+        assert targetBranch != null;
+        myBuild.addSharedConfigParameter(PremergeConstants.SHARED_PARAM, targetBranch);
+      }
+      return BuildFinishedStatus.FINISHED_SUCCESS;
     }
   }
 
@@ -109,11 +116,15 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     return myRunner;
   }
 
-  boolean getSuccess() {
-    return success;
+  ResultStatus getStatus() {
+    return status;
+  }
+
+  void setSuccess() {
+    status = ResultStatus.SUCCESS;
   }
 
   void setUnsuccess() {
-    success = false;
+    status = ResultStatus.FAILED;
   }
 }

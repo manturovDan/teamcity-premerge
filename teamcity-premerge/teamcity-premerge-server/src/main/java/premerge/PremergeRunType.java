@@ -46,13 +46,7 @@ public class PremergeRunType extends RunType {
     return new PropertiesProcessor() {
       @Override
       public Collection<InvalidProperty> process(Map<String, String> properties) {
-        //check branches are valid
         final HashSet<InvalidProperty> invalid = new HashSet<>();
-        String srcFilter = properties.get(PremergeConstants.SOURCE_BRANCHES_FILTER);
-        if (StringUtil.isEmpty(srcFilter)) {
-          invalid.add(new InvalidProperty(PremergeConstants.SOURCE_BRANCHES_FILTER, "Source branches filter must be specified"));
-        }
-
         String targetBranch = properties.get(PremergeConstants.TARGET_BRANCH);
         if (StringUtil.isEmpty(targetBranch)) {
           invalid.add(new InvalidProperty(PremergeConstants.TARGET_BRANCH, "Target branch must be specified"));
@@ -72,7 +66,7 @@ public class PremergeRunType extends RunType {
   @Nullable
   @Override
   public String getViewRunnerParamsJspFilePath() {
-    return null;
+    return myPluginDescriptor.getPluginResourcesPath("viewPremergeParams.jsp");
   }
 
   @Nullable
@@ -85,7 +79,6 @@ public class PremergeRunType extends RunType {
   @Override
   public String describeParameters(@NotNull Map<String, String> parameters) {
     StringBuilder builder = new StringBuilder();
-    builder.append("Source branches filter: ").append(StringUtil.emptyIfNull(parameters.get(PremergeConstants.SOURCE_BRANCHES_FILTER))).append("\n");
     builder.append("Target branch: ").append(StringUtil.emptyIfNull(parameters.get(PremergeConstants.TARGET_BRANCH)));
     return builder.toString();
   }

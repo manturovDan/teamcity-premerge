@@ -9,17 +9,6 @@
 
 <tr>
   <th>
-    <label for="<%= PremergeConstants.SOURCE_BRANCHES_FILTER %>">Source branches filter:</label></th>
-  <td>
-    <props:textProperty name="<%= PremergeConstants.SOURCE_BRANCHES_FILTER %>" className="longField"></props:textProperty>
-    <span class="smallNote"><a href="https://www.jetbrains.com/help/teamcity/branch-filter.html" target="_blank">
-      Branch filter</a> of source branches
-    </span>
-    <span class="error" id="error_<%= PremergeConstants.SOURCE_BRANCHES_FILTER %>"></span>
-  </td>
-</tr>
-<tr>
-  <th>
     <label for="<%= PremergeConstants.TARGET_BRANCH %>>">Target branch:</label>
   </th>
   <td>

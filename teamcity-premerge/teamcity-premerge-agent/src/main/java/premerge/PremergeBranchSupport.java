@@ -55,7 +55,7 @@ public class PremergeBranchSupport {
   }
 
   @NotNull
-  private String getLogicalName(@NotNull String branchName) {
+  public static String getLogicalName(@NotNull String branchName) {
     if (branchName.startsWith("refs/heads/")) {
       return branchName.substring("refs/heads/".length());
     }
@@ -77,14 +77,12 @@ public class PremergeBranchSupport {
   }
 
   public void fetch(String branch) throws VcsException {
-    String logicalBranch = getLogicalName(branch);
-
     try {
       myFacade.fetch()
               .setAuthSettings(myVcsRoot.getAuthSettings())
               .setUseNativeSsh(myConfig.isUseNativeSSH())
               .setTimeout(getTimeout())
-              .setRefspec("+" + logicalBranch + ":" + logicalBranch)
+              .setRefspec("+" + branch + ":" + branch)
               .setFetchTags(myConfig.isFetchTags())
               .setQuite(true)
               .call();
@@ -101,7 +99,7 @@ public class PremergeBranchSupport {
       myFacade.checkout()
               .setAuthSettings(myVcsRoot.getAuthSettings())
               .setUseNativeSsh(myConfig.isUseNativeSSH())
-              .setBranch(getLogicalName(branch))
+              .setBranch(branch)
               .setTimeout(myConfig.getCheckoutIdleTimeoutSeconds())
               .call();
     } catch (Exception e) {
@@ -115,8 +113,8 @@ public class PremergeBranchSupport {
   public void createBranch(String branch, String startPoint) throws VcsException {
     try {
       myFacade.createBranch()
-              .setName(getLogicalName(branch))
-              .setStartPoint(getLogicalName(startPoint))
+              .setName(branch)
+              .setStartPoint(startPoint)
               .call();
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Creating '" + branch + "' from '" + startPoint + "' error");
@@ -129,7 +127,7 @@ public class PremergeBranchSupport {
   public void merge(String branch) throws VcsException {
     try {
       myFacade.merge()
-              .setBranches(getLogicalName(branch))
+              .setBranches(branch)
               .call();
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Merging '" + branch +"' error");
