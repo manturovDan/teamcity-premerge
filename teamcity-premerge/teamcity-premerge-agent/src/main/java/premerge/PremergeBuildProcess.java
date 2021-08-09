@@ -40,6 +40,11 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @Override
   public void start() {
     myBuild.getBuildLogger().message("Preliminary merge fearture:");
+
+    myBuild.getSharedConfigParameters().entrySet().forEach(entry -> {
+      System.out.println(entry.getKey() + " " + entry.getValue());
+    });
+
     try {
       preliminaryMerge();
     }

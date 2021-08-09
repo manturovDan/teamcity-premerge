@@ -114,7 +114,7 @@ public class PremergeBranchSupport {
     try {
       myFacade.createBranch()
               .setName(branch)
-              .setStartPoint(startPoint)
+              //.setStartPoint("")
               .call();
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Creating '" + branch + "' from '" + startPoint + "' error");
