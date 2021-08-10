@@ -114,7 +114,7 @@ public class PremergeBranchSupport {
     try {
       myFacade.merge()
               .setBranches(branch)
-              .setQuite(true)
+              .setQuiet(true)
               .call();
       myProcess.setSuccess();
     } catch (VcsException vcsException) {
