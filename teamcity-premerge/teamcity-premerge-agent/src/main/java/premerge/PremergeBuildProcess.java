@@ -60,8 +60,6 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       branchSupport.createBranch(premergeBranch);
       branchSupport.checkout(premergeBranch);
       branchSupport.merge(targetBranch);
-
-      setSuccess();
     }
   }
 
@@ -75,8 +73,9 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       if (getStatus() == ResultStatus.SUCCESS) {
         assert targetBranch != null;
         myBuild.addSharedConfigParameter(PremergeConstants.SHARED_PARAM, targetBranch);
+        return BuildFinishedStatus.FINISHED_SUCCESS;
       }
-      return BuildFinishedStatus.FINISHED_SUCCESS;
+      return BuildFinishedStatus.FINISHED_WITH_PROBLEMS;
     }
   }
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import org.jetbrains.annotations.NotNull;
@@ -106,20 +107,38 @@ public class PremergeBranchSupport {
       myProcess.setUnsuccess();
       throw new VcsException(e);
     }
-    myProcess.getBuild().getBuildLogger().message("Created '" + branch + "' from '");
+    myProcess.getBuild().getBuildLogger().message("Created '" + branch + "'");
   }
 
   public void merge(String branch) throws VcsException {
     try {
       myFacade.merge()
               .setBranches(branch)
+              .setQuite(true)
               .call();
+      myProcess.setSuccess();
+    } catch (VcsException vcsException) {
+      String mergeCommits = getParameter("MERGE_HEAD");
+      if (!StringUtil.isEmpty(mergeCommits)) {
+        myProcess.getBuild().getBuildLogger().warning("Preliminary merge conflict with branch '" + branch + "'");
+        myProcess.setUnsuccess();
+        myFacade.merge()
+                .setAbort(true)
+                .call();
+        return;
+      }
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Merging '" + branch +"' error");
       myProcess.setUnsuccess();
       throw new VcsException(e);
     }
     myProcess.getBuild().getBuildLogger().message("'" + branch + "' was merged");
+  }
+
+  public String getParameter(String parameter) throws VcsException {
+    return myFacade.revParse()
+            .verify(parameter)
+            .call();
   }
 
   public int getTimeout() {
