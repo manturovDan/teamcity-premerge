@@ -2,9 +2,9 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+    <content url="file://$MODULE_DIR$/../../teamcity-premerge-agent">
+      <sourceFolder url="file://$MODULE_DIR$/../../teamcity-premerge-agent/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../teamcity-premerge-agent/src/main/resources" type="java-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
