@@ -1,3 +1,4 @@
-premerge/PremergeRunnerFactory.class
-premerge/PremergeRunnerInfo.class
-premerge/PremergeRunner.class
+premerge/PremergeBranchSupport.class
+premerge/PremergeBuildProcess$ResultStatus.class
+premerge/PremergeBuildProcess.class
+premerge/PremergeBuildRunner.class

@@ -7,7 +7,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <properties>
-    <teamcity.path.lib>${project.basedir}/../../../.idea_artifacts/agent_plugin_git/git-agent/lib/</teamcity.path.lib>
+    <teamcity.path.lib>${project.basedir}/../../../.idea_artifacts/agent_plugin_git/jetbrains.git/lib/</teamcity.path.lib>
   </properties>
   <artifactId>teamcity-premerge-agent</artifactId>
   <packaging>jar</packaging>
@@ -32,6 +32,22 @@
       <artifactId>tests-support</artifactId>
       <version>${teamcity-version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>local-agent</groupId>
+      <artifactId>org.jetbrains.teamcity.git.agent</artifactId>
+      <version>${teamcity-version}</version>
+      <scope>system</scope>
+      <systemPath>${teamcity.path.lib}/git-agent.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>local-agent</groupId>
+      <artifactId>org.jetbrains.teamcity.git.common</artifactId>
+      <version>${teamcity-version}</version>
+      <scope>system</scope>
+      <systemPath>${teamcity.path.lib}/git-common.jar</systemPath>
     </dependency>
 
   </dependencies>
