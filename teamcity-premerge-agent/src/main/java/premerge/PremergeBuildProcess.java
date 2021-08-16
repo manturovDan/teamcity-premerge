@@ -52,15 +52,22 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   protected void preliminaryMerge() throws VcsException {
     targetBranch = PremergeBranchSupport.cutRefsHeads(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
     for (VcsRootEntry entry : myBuild.getVcsRootEntries()) {
-      VcsRoot root = entry.getVcsRoot();
-      PremergeBranchSupport branchSupport = new PremergeBranchSupportImpl(this, root);
-
-      String premergeBranch = branchSupport.constructBranchName();
-      branchSupport.fetch(targetBranch);
-      branchSupport.createBranch(premergeBranch);
-      branchSupport.checkout(premergeBranch);
-      branchSupport.merge(targetBranch);
+      makeVcsRootPreliminaryMerge(entry.getVcsRoot());
     }
+  }
+
+  protected void makeVcsRootPreliminaryMerge(VcsRoot root) throws VcsException {
+    PremergeBranchSupport branchSupport = createPremergeBranchSupport(root);
+
+    String premergeBranch = branchSupport.constructBranchName();
+    branchSupport.fetch(targetBranch);
+    branchSupport.createBranch(premergeBranch);
+    branchSupport.checkout(premergeBranch);
+    branchSupport.merge(targetBranch);
+  }
+
+  protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root) throws VcsException {
+    return new PremergeBranchSupportImpl(this, root);
   }
 
   @NotNull
@@ -109,7 +116,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     return myRunner;
   }
 
-  ResultStatus getStatus() {
+  public ResultStatus getStatus() {
     return status;
   }
 
