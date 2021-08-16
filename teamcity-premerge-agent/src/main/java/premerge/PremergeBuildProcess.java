@@ -53,9 +53,9 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     targetBranch = PremergeBranchSupport.cutRefsHeads(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
     for (VcsRootEntry entry : myBuild.getVcsRootEntries()) {
       VcsRoot root = entry.getVcsRoot();
-      PremergeBranchSupport branchSupport = new PremergeBranchSupport(this, root);
+      PremergeBranchSupport branchSupport = new PremergeBranchSupportImpl(this, root);
 
-      String premergeBranch = branchSupport.constructName();
+      String premergeBranch = branchSupport.constructBranchName();
       branchSupport.fetch(targetBranch);
       branchSupport.createBranch(premergeBranch);
       branchSupport.checkout(premergeBranch);
