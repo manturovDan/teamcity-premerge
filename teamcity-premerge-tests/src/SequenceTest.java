@@ -1,11 +1,7 @@
 import java.io.IOException;
-import java.util.Map;
-import jetbrains.buildServer.RunnerTest2Base;
 import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildRunnerContext;
-import jetbrains.buildServer.agent.MockAgentBuildRunner;
-import jetbrains.buildServer.agent.impl.AgentRunningBuildImpl;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentVcsSupport;
@@ -13,18 +9,10 @@ import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactory;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactory;
 import jetbrains.buildServer.buildTriggers.vcs.git.tests.AgentSupportBuilder;
 import jetbrains.buildServer.buildTriggers.vcs.git.tests.builders.AgentRunningBuildBuilder;
-import jetbrains.buildServer.vcs.VcsException;
-import jetbrains.buildServer.vcs.VcsRoot;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jmock.Mockery;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import premerge.PremergeBranchSupport;
-import premerge.PremergeBuildProcess;
-import premerge.PremergeBuildRunner;
 
-public class SimpleTest {
+public class SequenceTest {
   private MirrorManager myMirrorManager;
   private PluginConfigFactory myPluginConfigFactory;
   private GitMetaFactory myGitMetaFactory;
@@ -32,9 +20,9 @@ public class SimpleTest {
   private TempFiles myTempFiles;
   private AgentSupportBuilder myAgentSupportBuilder;
   private GitAgentVcsSupport myVcsSupport;
+  private MockPremergeBuildProcess process;
 
-  @Test
-  public void simpleTest() throws IOException {
+  private void initMocks() throws IOException {
     myTempFiles = new TempFiles();
     myAgentSupportBuilder = new AgentSupportBuilder(myTempFiles);
 
@@ -47,61 +35,22 @@ public class SimpleTest {
 
 
     AgentRunningBuildBuilder builder = new AgentRunningBuildBuilder();
-    builder.addRootEntry(new VcsRoot() {
-      @Override
-      public long getId() {
-        return 0;
-      }
-
-      @NotNull
-      @Override
-      public String getName() {
-        return null;
-      }
-
-      @NotNull
-      @Override
-      public String getVcsName() {
-        return null;
-      }
-
-      @NotNull
-      @Override
-      public Map<String, String> getProperties() {
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public String getProperty(@NotNull String propertyName) {
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public String getProperty(@NotNull String propertyName, @Nullable String defaultValue) {
-        return null;
-      }
-
-      @NotNull
-      @Override
-      public String getExternalId() {
-        return null;
-      }
-
-      @NotNull
-      @Override
-      public String describe(boolean verbose) {
-        return null;
-      }
-    }, "");
+    builder.addRootEntry(new MockVcsRoot(), "");
     AgentRunningBuild build = builder.build();
     BuildRunnerContext context = new MockBuildRunnerCtx();
+    process = new MockPremergeBuildProcess(myPluginConfigFactory, mySshService, myGitMetaFactory, myMirrorManager, build, context);
 
-    PremergeBuildProcess process = new MockPremergeBuildProcess(myPluginConfigFactory, mySshService, myGitMetaFactory, myMirrorManager, build, context);
+  }
 
+  @Test
+  public void successfulSequenceTest() throws IOException {
+    initMocks();
+
+    process.setBranchSuppoerClass(MockPremergeBranchSupportSuccess.class);
     process.start();
+    process.waitFor();
 
-    System.out.println(process.getStatus());
+    Assert.assertEquals(process.getTestStatus(),
+                        "fetched_main,branch_premerge_branch_created,checkouted_to_premerge_branch,merged_main");
   }
 }

@@ -1,7 +1,5 @@
 package premerge;
 
-import java.util.HashMap;
-import java.util.Map;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
 import jetbrains.buildServer.util.StringUtil;
@@ -10,7 +8,7 @@ import jetbrains.buildServer.vcs.VcsRoot;
 import org.jetbrains.annotations.NotNull;
 
 public class PremergeBranchSupportImpl implements PremergeBranchSupport {
-  @NotNull private final GitFacade myFacade;
+  @NotNull private final AgentGitFacade myFacade;
   @NotNull private final VcsRoot myRoot;
   @NotNull private final AgentPluginConfig myConfig;
   @NotNull private final PremergeBuildProcess myProcess;
@@ -25,29 +23,10 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
     myFacade = getFacade();
   }
 
-  protected GitFacade getFacade() {
-    Map<String, String> env = getGitCommandEnv();
+  protected AgentGitFacade getFacade() {
     GitFactory gitFactory = myProcess.getGitMetaFactory().createFactory(myProcess.getSshService(),
-                                                                        myConfig,
-                                                                        getLogger(),
-                                                                        myProcess.getBuild().getBuildTempDirectory(),
-                                                                        env,
                                                                         new BuildContext(myProcess.getBuild(), myConfig));
     return gitFactory.create(myProcess.getBuild().getCheckoutDirectory());
-  }
-
-  @NotNull
-  protected Map<String, String> getGitCommandEnv() {
-    if (myConfig.isRunGitWithBuildEnv()) {
-      return myProcess.getBuild().getBuildParameters().getEnvironmentVariables();
-    } else {
-      return new HashMap<>(0);
-    }
-  }
-
-  @NotNull
-  protected GitBuildProgressLogger getLogger() {
-    return new GitBuildProgressLogger(myProcess.getBuild().getBuildLogger().getFlowLogger("-1"), myConfig.getGitProgressMode());
   }
 
   @Override
@@ -99,7 +78,7 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
               .setName(branch)
               .call();
     } catch (Exception e) {
-      myProcess.getBuild().getBuildLogger().error("Creating '" + branch + "'");
+      myProcess.getBuild().getBuildLogger().error("Creating '" + branch + "' error");
       myProcess.setUnsuccess();
       throw new VcsException(e);
     }
