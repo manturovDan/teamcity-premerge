@@ -32,7 +32,7 @@ public class MultipleRootsTest {
   }
 
   @Test
-  public void multipleRootsSuccess() {
+  public void multipleVcsRootsSuccess() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
     MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
@@ -59,7 +59,7 @@ public class MultipleRootsTest {
   }
 
   @Test
-  public void multipleFetchError() {
+  public void multipleVcsFetchError() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
     MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
@@ -87,7 +87,7 @@ public class MultipleRootsTest {
   }
 
   @Test
-  public void multipleConflictError() {
+  public void multipleVcsConflictError() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
     MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
@@ -113,6 +113,41 @@ public class MultipleRootsTest {
         Assert.assertEquals(statuses.size(), 5);
         Assert.assertEquals(statuses.get(3), "verif_MERGE_HEAD");
         Assert.assertEquals(statuses.get(4), "merge_aborting");
+      }
+      else {
+        Assert.assertEquals(statuses.size(), 4);
+        Assert.assertEquals(statuses.get(3), "merging");
+      }
+    }
+  }
+
+  @Test
+  public void multipleVcsAbortError() {
+    AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
+    BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
+    MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
+                                                                    sshService,
+                                                                    gitMetaFactory,
+                                                                    mirrorManager,
+                                                                    runningBuild,
+                                                                    runnerContext);
+
+    process.setMergeSuccess(false, 1);
+    process.setAbortSuccess(false, 1);
+    process.setBranchSupportClass(MockPremergeBranchSupport.class);
+    process.start();
+    Assert.assertEquals(process.waitFor().toString(), "FINISHED_FAILED");
+    Assert.assertEquals(process.getStatus().toString(), "FAILED");
+    Assert.assertEquals(process.getSupports().size(), 2);
+
+    for (int i = 0; i < process.getSupports().size(); i++) {
+      List<String> statuses = process.getSupports().get(i).getBuilder().getSequence();
+      Assert.assertEquals(statuses.get(0), "fetching");
+      Assert.assertEquals(statuses.get(1), "branchCreation");
+      Assert.assertEquals(statuses.get(2), "checkouting");
+      if (i == 1) {
+        Assert.assertEquals(statuses.size(), 4);
+        Assert.assertEquals(statuses.get(3), "verif_MERGE_HEAD");
       }
       else {
         Assert.assertEquals(statuses.size(), 4);
