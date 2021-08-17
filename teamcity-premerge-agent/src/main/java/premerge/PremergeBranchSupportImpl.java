@@ -1,5 +1,6 @@
 package premerge;
 
+import jetbrains.buildServer.buildTriggers.vcs.git.AuthSettings;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
 import jetbrains.buildServer.util.StringUtil;
@@ -11,22 +12,34 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   @NotNull private final AgentGitFacade myFacade;
   @NotNull private final VcsRoot myRoot;
   @NotNull private final AgentPluginConfig myConfig;
-  @NotNull private final PremergeBuildProcess myProcess;
+  @NotNull protected final PremergeBuildProcess myProcess;
   @NotNull private final AgentGitVcsRoot myVcsRoot;
 
   public PremergeBranchSupportImpl(@NotNull PremergeBuildProcess process,
                                    @NotNull VcsRoot root) throws VcsException {
     myRoot = root;
     myProcess = process;
-    myConfig = myProcess.getConfigFactory().createConfig(myProcess.getBuild(), myRoot);
-    myVcsRoot = new AgentGitVcsRoot(myProcess.getMirrorManager(), myProcess.getBuild().getCheckoutDirectory(), root);
+    myConfig = createPluginConfig();
+    myVcsRoot = createGitVcsRoot(root);
     myFacade = getFacade();
+  }
+
+  protected AgentPluginConfig createPluginConfig() throws VcsException {
+    return myProcess.getConfigFactory().createConfig(myProcess.getBuild(), myRoot);
+  }
+
+  protected AgentGitVcsRoot createGitVcsRoot(VcsRoot root) throws VcsException {
+    return new AgentGitVcsRoot(myProcess.getMirrorManager(), myProcess.getBuild().getCheckoutDirectory(), root);
   }
 
   protected AgentGitFacade getFacade() {
     GitFactory gitFactory = myProcess.getGitMetaFactory().createFactory(myProcess.getSshService(),
                                                                         new BuildContext(myProcess.getBuild(), myConfig));
     return gitFactory.create(myProcess.getBuild().getCheckoutDirectory());
+  }
+
+  protected AuthSettings retrieveAuthSettings() {
+    return myVcsRoot.getAuthSettings();
   }
 
   @Override
@@ -39,7 +52,7 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   public void fetch(String branch) throws VcsException {
     try {
       myFacade.fetch()
-              .setAuthSettings(myVcsRoot.getAuthSettings())
+              .setAuthSettings(retrieveAuthSettings())
               .setUseNativeSsh(myConfig.isUseNativeSSH())
               .setTimeout(getTimeout())
               .setRefspec("+" + branch + ":" + branch)
@@ -58,7 +71,7 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   public void checkout(String branch) throws VcsException {
     try {
       myFacade.checkout()
-              .setAuthSettings(myVcsRoot.getAuthSettings())
+              .setAuthSettings(retrieveAuthSettings())
               .setUseNativeSsh(myConfig.isUseNativeSSH())
               .setBranch(branch)
               .setTimeout(myConfig.getCheckoutIdleTimeoutSeconds())

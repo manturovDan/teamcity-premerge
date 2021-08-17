@@ -16,7 +16,14 @@ import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class MockRunnerBuildFactory {
+public class MockRunnerBuildBuilder {
+  private int myBuildId = 0;
+
+  public MockRunnerBuildBuilder setBuildId(int buildId) {
+    myBuildId = buildId;
+    return this;
+  }
+
   AgentRunningBuild build() {
     return new AgentRunningBuild() {
       @NotNull
@@ -173,7 +180,7 @@ public class MockRunnerBuildFactory {
 
       @Override
       public long getBuildId() {
-        return 0;
+        return myBuildId;
       }
 
       @Override

@@ -11,7 +11,7 @@ import premerge.PremergeBranchSupport;
 import premerge.PremergeBuildProcess;
 
 public class MockPremergeBuildProcess extends PremergeBuildProcess {
-  private Class<? extends MockPremergeBranchSupportSuccess> myBranchSupportClass = MockPremergeBranchSupportSuccess.class;
+  private Class<? extends PremergeBranchSupport> myBranchSupportClass = MockPremergeBranchSupportSuccess.class;
   private String myTestStatus = "NOT_STARTED";
 
   public MockPremergeBuildProcess(@NotNull PluginConfigFactory configFactory,
@@ -23,8 +23,8 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
     super(configFactory, sshService, gitMetaFactory, mirrorManager, build, runner);
   }
 
-  protected void setBranchSuppoerClass(Class<? extends MockPremergeBranchSupportSuccess> branchSuppoerClass) {
-    myBranchSupportClass = branchSuppoerClass;
+  protected void setBranchSuppoerClass(Class<? extends PremergeBranchSupport> branchSupportClass) {
+    myBranchSupportClass = branchSupportClass;
   }
 
   public void setTestStatus(String status) {
@@ -39,6 +39,9 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
   protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root) throws VcsException {
     if (myBranchSupportClass.equals(MockPremergeBranchSupportSuccess.class)) {
       return new MockPremergeBranchSupportSuccess(this);
+    }
+    if (myBranchSupportClass.equals(MockPremergeBranchSupport.class)) {
+      return new MockPremergeBranchSupport(this, root);
     }
     return null;
   }

@@ -1,4 +1,6 @@
+import java.util.HashMap;
 import java.util.Map;
+import jetbrains.buildServer.buildTriggers.vcs.git.Constants;
 import jetbrains.buildServer.vcs.VcsRoot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +32,9 @@ public class MockVcsRoot implements VcsRoot {
   @NotNull
   @Override
   public Map<String, String> getProperties() {
-    return null;
+    return new HashMap<String, String>() {{
+      put(Constants.FETCH_URL, "https://");
+    }};
   }
 
   @Nullable

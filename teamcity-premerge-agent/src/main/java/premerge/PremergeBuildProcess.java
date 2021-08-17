@@ -87,32 +87,32 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   }
 
   @NotNull
-  PluginConfigFactory getConfigFactory() {
+  public PluginConfigFactory getConfigFactory() {
     return myConfigFactory;
   }
 
   @NotNull
-  GitAgentSSHService getSshService() {
+  public GitAgentSSHService getSshService() {
     return mySshService;
   }
 
   @NotNull
-  GitMetaFactory getGitMetaFactory() {
+  public GitMetaFactory getGitMetaFactory() {
     return myGitMetaFactory;
   }
 
   @NotNull
-  MirrorManager getMirrorManager() {
+  public MirrorManager getMirrorManager() {
     return myMirrorManager;
   }
 
   @NotNull
-  AgentRunningBuild getBuild() {
+  public AgentRunningBuild getBuild() {
     return myBuild;
   }
 
   @NotNull
-  BuildRunnerContext getRunner() {
+  public BuildRunnerContext getRunner() {
     return myRunner;
   }
 
