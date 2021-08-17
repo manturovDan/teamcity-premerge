@@ -43,12 +43,6 @@ public class MockPremergeBranchSupport extends PremergeBranchSupportImpl {
 
   @Override
   protected AgentPluginConfig createPluginConfig() throws VcsException {
-    try {
-      Class<?> c = Class.forName("jetbrains.buildServer.buildTriggers.vcs.git.agent.FetchHeadsMode");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     Mockery context = new Mockery();
     AgentPluginConfig config = context.mock(AgentPluginConfig.class);
 

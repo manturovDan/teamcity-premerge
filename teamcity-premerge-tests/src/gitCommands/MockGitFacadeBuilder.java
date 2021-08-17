@@ -21,7 +21,11 @@ public class MockGitFacadeBuilder {
   private boolean myMergeSuccess = true;
   private boolean myAbortSuccess = true;
 
-  public List<String> sequence = new ArrayList<>();
+  private List<String> sequence = new ArrayList<>();
+
+  public List<String> getSequence() {
+    return sequence;
+  }
 
   public void setFetchSuccess(boolean fetchSuccess) {
     myFetchSuccess = fetchSuccess;
@@ -234,6 +238,7 @@ public class MockGitFacadeBuilder {
       @Override
       public RevParseCommand revParse() {
         return new RevParseCommand() {
+          private String verified = "";
           @NotNull
           @Override
           public RevParseCommand setRef(String ref) {
@@ -249,12 +254,13 @@ public class MockGitFacadeBuilder {
           @NotNull
           @Override
           public RevParseCommand verify(String param) {
+            verified = param;
             return this;
           }
 
-          @Nullable
           @Override
           public String call() throws VcsException {
+            sequence.add("verif_" + verified);
             return "merge_sha";
           }
 
@@ -389,7 +395,7 @@ public class MockGitFacadeBuilder {
             }
             else {
               if (myMergeSuccess) {
-                sequence.add("mergeing");
+                sequence.add("merging");
               }
               else {
                 throw new VcsException("Conflict err");

@@ -15,6 +15,11 @@ import premerge.PremergeBuildProcess;
 public class MockPremergeBuildProcess extends PremergeBuildProcess {
   private Class<? extends PremergeBranchSupport> myBranchSupportClass = MockPremergeBranchSupportSuccess.class;
   private String myTestStatus = "NOT_STARTED";
+  private List<Boolean> myFetchSuccess = new ArrayList<Boolean>() {{ add(true); }};
+  private List<Boolean> myMergeSuccess = new ArrayList<Boolean>() {{ add(true); }};
+  private List<Boolean> myAbortSuccess = new ArrayList<Boolean>() {{ add(true); }};
+  private int branchSupportCounter = 0;
+
   private final List<MockPremergeBranchSupport> supports = new ArrayList<>();
 
   public MockPremergeBuildProcess(@NotNull PluginConfigFactory configFactory,
@@ -26,11 +31,23 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
     super(configFactory, sshService, gitMetaFactory, mirrorManager, build, runner);
   }
 
+  public void setFetchSuccess(boolean fetchSuccess, int num) {
+    myFetchSuccess.add(num, fetchSuccess);
+  }
+
+  public void setMergeSuccess(boolean mergeSuccess, int num) {
+    myMergeSuccess.add(num, mergeSuccess);
+  }
+
+  public void setAbortSuccess(boolean abortSuccess, int num) {
+    myAbortSuccess.add(num, abortSuccess);
+  }
+
   public List<MockPremergeBranchSupport> getSupports() {
     return supports;
   }
 
-  protected void setBranchSuppoerClass(Class<? extends PremergeBranchSupport> branchSupportClass) {
+  protected void setBranchSupportClass(Class<? extends PremergeBranchSupport> branchSupportClass) {
     myBranchSupportClass = branchSupportClass;
   }
 
@@ -42,16 +59,21 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
     return myTestStatus;
   }
 
-  @Override
   protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root) throws VcsException {
     if (myBranchSupportClass.equals(MockPremergeBranchSupportSuccess.class)) {
+      branchSupportCounter++;
       return new MockPremergeBranchSupportSuccess(this);
     }
     if (myBranchSupportClass.equals(MockPremergeBranchSupport.class)) {
       MockPremergeBranchSupport support = new MockPremergeBranchSupport(this, root);
+      support.getBuilder().setFetchSuccess(myFetchSuccess.get(branchSupportCounter));
+      support.getBuilder().setMergeSuccess(myMergeSuccess.get(branchSupportCounter));
+      support.getBuilder().setAbortSuccess(myAbortSuccess.get(branchSupportCounter));
       supports.add(support);
+      branchSupportCounter++;
       return support;
     }
+    branchSupportCounter++;
     return null;
   }
 }
