@@ -1,6 +1,8 @@
 package gitCommands;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import jetbrains.buildServer.buildTriggers.vcs.git.AuthSettings;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.AgentGitFacade;
@@ -12,11 +14,14 @@ import jetbrains.buildServer.buildTriggers.vcs.git.command.VersionCommand;
 import jetbrains.buildServer.buildTriggers.vcs.git.command.credentials.ScriptGen;
 import jetbrains.buildServer.vcs.VcsException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class MockGitFacadeBuilder {
   private boolean myFetchSuccess = true;
   private boolean myMergeSuccess = true;
   private boolean myAbortSuccess = true;
+
+  public List<String> sequence = new ArrayList<>();
 
   public void setFetchSuccess(boolean fetchSuccess) {
     myFetchSuccess = fetchSuccess;
@@ -62,7 +67,7 @@ public class MockGitFacadeBuilder {
 
           @Override
           public void call() throws VcsException {
-
+            sequence.add("branchCreation");
           }
 
           @Override
@@ -142,7 +147,7 @@ public class MockGitFacadeBuilder {
 
           @Override
           public void call() throws VcsException {
-
+            sequence.add("checkouting");
           }
 
           @NotNull
@@ -228,7 +233,46 @@ public class MockGitFacadeBuilder {
       @NotNull
       @Override
       public RevParseCommand revParse() {
-        return null;
+        return new RevParseCommand() {
+          @NotNull
+          @Override
+          public RevParseCommand setRef(String ref) {
+            return this;
+          }
+
+          @NotNull
+          @Override
+          public RevParseCommand setShallow(boolean isShallow) {
+            return this;
+          }
+
+          @NotNull
+          @Override
+          public RevParseCommand verify(String param) {
+            return this;
+          }
+
+          @Nullable
+          @Override
+          public String call() throws VcsException {
+            return "merge_sha";
+          }
+
+          @Override
+          public void addConfig(@NotNull String name, @NotNull String value) {
+
+          }
+
+          @Override
+          public void setEnv(@NotNull String name, @NotNull String value) {
+
+          }
+
+          @Override
+          public void addPostAction(@NotNull Runnable action) {
+
+          }
+        };
       }
 
       @NotNull
@@ -336,12 +380,18 @@ public class MockGitFacadeBuilder {
           @Override
           public void call() throws VcsException {
             if (isAbort) {
-              if (!myAbortSuccess) {
+              if (myAbortSuccess) {
+                sequence.add("merge_aborting");
+              }
+              else {
                 throw new VcsException("Abort error");
               }
             }
             else {
-              if (!myMergeSuccess) {
+              if (myMergeSuccess) {
+                sequence.add("mergeing");
+              }
+              else {
                 throw new VcsException("Conflict err");
               }
             }
@@ -412,7 +462,10 @@ public class MockGitFacadeBuilder {
 
           @Override
           public void call() throws VcsException {
-            if (!myFetchSuccess) {
+            if (myFetchSuccess) {
+              sequence.add("fetching");
+            }
+            else {
               throw new VcsException("Mock connection error");
             }
           }

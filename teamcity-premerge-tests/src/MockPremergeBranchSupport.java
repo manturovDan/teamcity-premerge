@@ -1,6 +1,8 @@
 import gitCommands.MockGitFacadeBuilder;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import jetbrains.buildServer.buildTriggers.vcs.git.AuthSettings;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVcsRoot;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
@@ -8,6 +10,7 @@ import jetbrains.buildServer.buildTriggers.vcs.git.agent.AgentGitFacade;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.AgentGitVcsRoot;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.AgentPluginConfig;
 import jetbrains.buildServer.buildTriggers.vcs.git.command.GitExec;
+import jetbrains.buildServer.buildTriggers.vcs.git.command.GitFacade;
 import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +23,8 @@ import premerge.PremergeBranchSupportImpl;
 import premerge.PremergeBuildProcess;
 
 public class MockPremergeBranchSupport extends PremergeBranchSupportImpl {
+  private MockGitFacadeBuilder myBuilder;
+
   public MockPremergeBranchSupport(@NotNull PremergeBuildProcess process,
                                    @NotNull VcsRoot root) throws VcsException {
     super(process, root);
@@ -27,7 +32,13 @@ public class MockPremergeBranchSupport extends PremergeBranchSupportImpl {
 
   @Override
   protected AgentGitFacade getFacade() {
-    return new MockGitFacadeBuilder().build();
+    return getBuilder().build();
+  }
+
+  public MockGitFacadeBuilder getBuilder() {
+    if (myBuilder == null)
+      myBuilder = new MockGitFacadeBuilder();
+    return myBuilder;
   }
 
   @Override

@@ -71,5 +71,6 @@ public class PremergeCommadsTest {
     process.start();
     process.waitFor();
     Assert.assertEquals(process.getStatus().toString(), "SUCCESS");
+    System.out.println(process.getSupports().get(0).getBuilder().sequence);
   }
 }

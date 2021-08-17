@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
@@ -13,6 +15,7 @@ import premerge.PremergeBuildProcess;
 public class MockPremergeBuildProcess extends PremergeBuildProcess {
   private Class<? extends PremergeBranchSupport> myBranchSupportClass = MockPremergeBranchSupportSuccess.class;
   private String myTestStatus = "NOT_STARTED";
+  private final List<MockPremergeBranchSupport> supports = new ArrayList<>();
 
   public MockPremergeBuildProcess(@NotNull PluginConfigFactory configFactory,
                                   @NotNull GitAgentSSHService sshService,
@@ -21,6 +24,10 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
                                   @NotNull AgentRunningBuild build,
                                   @NotNull BuildRunnerContext runner) {
     super(configFactory, sshService, gitMetaFactory, mirrorManager, build, runner);
+  }
+
+  public List<MockPremergeBranchSupport> getSupports() {
+    return supports;
   }
 
   protected void setBranchSuppoerClass(Class<? extends PremergeBranchSupport> branchSupportClass) {
@@ -41,7 +48,9 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
       return new MockPremergeBranchSupportSuccess(this);
     }
     if (myBranchSupportClass.equals(MockPremergeBranchSupport.class)) {
-      return new MockPremergeBranchSupport(this, root);
+      MockPremergeBranchSupport support = new MockPremergeBranchSupport(this, root);
+      supports.add(support);
+      return support;
     }
     return null;
   }
