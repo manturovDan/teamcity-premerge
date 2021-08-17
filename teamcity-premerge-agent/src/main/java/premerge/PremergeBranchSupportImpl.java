@@ -108,9 +108,9 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
       myProcess.setSuccess();
     } catch (VcsException vcsException) {
       String mergeCommits = getParameter("MERGE_HEAD");
+      myProcess.setUnsuccess();
       if (!StringUtil.isEmpty(mergeCommits)) {
         myProcess.getBuild().getBuildLogger().warning("Preliminary merge conflict with branch '" + branch + "'");
-        myProcess.setUnsuccess();
         myFacade.merge()
                 .setAbort(true)
                 .call();
@@ -118,7 +118,6 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
       }
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Merging '" + branch +"' error");
-      myProcess.setUnsuccess();
       throw new VcsException(e);
     }
     myProcess.getBuild().getBuildLogger().message("'" + branch + "' was merged");

@@ -15,9 +15,9 @@ import premerge.PremergeBuildProcess;
 public class MockPremergeBuildProcess extends PremergeBuildProcess {
   private Class<? extends PremergeBranchSupport> myBranchSupportClass = MockPremergeBranchSupportSuccess.class;
   private String myTestStatus = "NOT_STARTED";
-  private List<Boolean> myFetchSuccess = new ArrayList<Boolean>() {{ add(true); }};
-  private List<Boolean> myMergeSuccess = new ArrayList<Boolean>() {{ add(true); }};
-  private List<Boolean> myAbortSuccess = new ArrayList<Boolean>() {{ add(true); }};
+  private final List<Boolean> myFetchSuccess = new ArrayList<Boolean>();
+  private final List<Boolean> myMergeSuccess = new ArrayList<Boolean>();
+  private final List<Boolean> myAbortSuccess = new ArrayList<Boolean>();
   private int branchSupportCounter = 0;
 
   private final List<MockPremergeBranchSupport> supports = new ArrayList<>();
@@ -32,14 +32,25 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
   }
 
   public void setFetchSuccess(boolean fetchSuccess, int num) {
+    for (int i = myFetchSuccess.size(); i < num; ++i) {
+      myFetchSuccess.add(true);
+    }
+
     myFetchSuccess.add(num, fetchSuccess);
   }
 
   public void setMergeSuccess(boolean mergeSuccess, int num) {
+    for (int i = myMergeSuccess.size(); i < num; ++i) {
+      myMergeSuccess.add(true);
+    }
     myMergeSuccess.add(num, mergeSuccess);
   }
 
   public void setAbortSuccess(boolean abortSuccess, int num) {
+    for (int i = myAbortSuccess.size(); i < num; ++i) {
+      myAbortSuccess.add(true);
+    }
+
     myAbortSuccess.add(num, abortSuccess);
   }
 
@@ -66,9 +77,9 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
     }
     if (myBranchSupportClass.equals(MockPremergeBranchSupport.class)) {
       MockPremergeBranchSupport support = new MockPremergeBranchSupport(this, root);
-      support.getBuilder().setFetchSuccess(myFetchSuccess.get(branchSupportCounter));
-      support.getBuilder().setMergeSuccess(myMergeSuccess.get(branchSupportCounter));
-      support.getBuilder().setAbortSuccess(myAbortSuccess.get(branchSupportCounter));
+      support.getBuilder().setFetchSuccess(myFetchSuccess.size() > branchSupportCounter ? myFetchSuccess.get(branchSupportCounter) : true);
+      support.getBuilder().setMergeSuccess(myMergeSuccess.size() > branchSupportCounter ? myMergeSuccess.get(branchSupportCounter) : true);
+      support.getBuilder().setAbortSuccess(myAbortSuccess.size() > branchSupportCounter ? myAbortSuccess.get(branchSupportCounter) : true);
       supports.add(support);
       branchSupportCounter++;
       return support;

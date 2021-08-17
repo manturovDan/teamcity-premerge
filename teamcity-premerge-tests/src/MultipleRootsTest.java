@@ -10,10 +10,8 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import premerge.PremergeBranchSupport;
-import premerge.PremergeConstants;
 
-public class PremergeCommadsTest {
+public class MultipleRootsTest {
   private Mockery context;
   private GitMetaFactory gitMetaFactory;
   private GitAgentSSHService sshService;
@@ -34,39 +32,9 @@ public class PremergeCommadsTest {
   }
 
   @Test
-  public void processTest() {
-    AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setBuildId(780).build();
+  public void multipleRootsSuccess() {
+    AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
-    MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
-                                                                    sshService,
-                                                                    gitMetaFactory,
-                                                                    mirrorManager,
-                                                                    runningBuild,
-                                                                    runnerContext);
-
-    process.setBranchSupportClass(MockPremergeBranchSupportSuccess.class);
-
-    Assert.assertEquals(process.getTestStatus(), "NOT_STARTED");
-    process.start();
-    process.waitFor();
-    Assert.assertEquals(process.getTestStatus(), "fetched_main,branch_premerge_branch_created,checkouted_to_premerge_branch,merged_main");
-  }
-
-  @Test
-  public void cutRefsHeadsTest() {
-    Assert.assertEquals(PremergeBranchSupport.cutRefsHeads("refs/heads/master"), "master");
-    Assert.assertEquals(PremergeBranchSupport.cutRefsHeads("master"), "master");
-    Assert.assertEquals(PremergeBranchSupport.cutRefsHeads("refs/pull/123/head"), "refs/pull/123/head");
-  }
-
-  @Test
-  public void successfulPremergeTest() {
-    AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setBuildId(780).build();
-    BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
-
-    Assert.assertEquals(runningBuild.getBuildId(), 780);
-    Assert.assertEquals(runnerContext.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH), "main");
-
     MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
                                                                     sshService,
                                                                     gitMetaFactory,
@@ -76,24 +44,24 @@ public class PremergeCommadsTest {
 
     process.setBranchSupportClass(MockPremergeBranchSupport.class);
     process.start();
-    process.waitFor();
+    Assert.assertEquals(process.waitFor().toString(), "FINISHED_SUCCESS");
     Assert.assertEquals(process.getStatus().toString(), "SUCCESS");
-    List<String> statuses = process.getSupports().get(0).getBuilder().getSequence();
-    Assert.assertEquals(statuses.size(), 4);
-    Assert.assertEquals(statuses.get(0), "fetching");
-    Assert.assertEquals(statuses.get(1), "branchCreation");
-    Assert.assertEquals(statuses.get(2), "checkouting");
-    Assert.assertEquals(statuses.get(3), "merging");
+    Assert.assertEquals(process.getSupports().size(), 3);
+
+    for (int i = 0; i < process.getSupports().size(); ++i) {
+      List<String> statuses = process.getSupports().get(i).getBuilder().getSequence();
+      Assert.assertEquals(statuses.size(), 4);
+      Assert.assertEquals(statuses.get(0), "fetching");
+      Assert.assertEquals(statuses.get(1), "branchCreation");
+      Assert.assertEquals(statuses.get(2), "checkouting");
+      Assert.assertEquals(statuses.get(3), "merging");
+    }
   }
 
   @Test
-  public void FetchErrorTest() {
-    AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setBuildId(780).build();
+  public void multipleFetchError() {
+    AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
-
-    Assert.assertEquals(runningBuild.getBuildId(), 780);
-    Assert.assertEquals(runnerContext.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH), "main");
-
     MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
                                                                     sshService,
                                                                     gitMetaFactory,
@@ -101,43 +69,55 @@ public class PremergeCommadsTest {
                                                                     runningBuild,
                                                                     runnerContext);
 
+    process.setFetchSuccess(false, 1);
     process.setBranchSupportClass(MockPremergeBranchSupport.class);
-    process.setFetchSuccess(false, 0);
-
-    process.start();
-    process.waitFor();
-    Assert.assertEquals(process.getStatus().toString(), "FAILED");
-    List<String> statuses = process.getSupports().get(0).getBuilder().getSequence();
-    Assert.assertEquals(statuses.size(), 0);
-  }
-
-  @Test
-  public void conflictTest() {
-    AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setBuildId(780).build();
-    BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
-
-    Assert.assertEquals(runningBuild.getBuildId(), 780);
-    Assert.assertEquals(runnerContext.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH), "main");
-
-    MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
-                                                                    sshService,
-                                                                    gitMetaFactory,
-                                                                    mirrorManager,
-                                                                    runningBuild,
-                                                                    runnerContext);
-
-    process.setBranchSupportClass(MockPremergeBranchSupport.class);
-    process.setMergeSuccess(false, 0);
-
     process.start();
     Assert.assertEquals(process.waitFor().toString(), "FINISHED_FAILED");
     Assert.assertEquals(process.getStatus().toString(), "FAILED");
-    List<String> statuses = process.getSupports().get(0).getBuilder().getSequence();
-    Assert.assertEquals(statuses.size(), 5);
-    Assert.assertEquals(statuses.get(0), "fetching");
-    Assert.assertEquals(statuses.get(1), "branchCreation");
-    Assert.assertEquals(statuses.get(2), "checkouting");
-    Assert.assertEquals(statuses.get(3), "verif_MERGE_HEAD");
-    Assert.assertEquals(statuses.get(4), "merge_aborting");
+    Assert.assertEquals(process.getSupports().size(), 2);
+
+    List<String> statuses0 = process.getSupports().get(0).getBuilder().getSequence();
+    Assert.assertEquals(statuses0.size(), 4);
+    Assert.assertEquals(statuses0.get(0), "fetching");
+    Assert.assertEquals(statuses0.get(1), "branchCreation");
+    Assert.assertEquals(statuses0.get(2), "checkouting");
+    Assert.assertEquals(statuses0.get(3), "merging");
+
+    Assert.assertEquals(process.getSupports().get(1).getBuilder().getSequence().size(), 0);
+  }
+
+  @Test
+  public void multipleConflictError() {
+    AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
+    BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
+    MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
+                                                                    sshService,
+                                                                    gitMetaFactory,
+                                                                    mirrorManager,
+                                                                    runningBuild,
+                                                                    runnerContext);
+
+    process.setMergeSuccess(false, 1);
+    process.setBranchSupportClass(MockPremergeBranchSupport.class);
+    process.start();
+    Assert.assertEquals(process.waitFor().toString(), "FINISHED_FAILED");
+    Assert.assertEquals(process.getStatus().toString(), "FAILED");
+    Assert.assertEquals(process.getSupports().size(), 3);
+
+    for (int i = 0; i < process.getSupports().size(); i++) {
+      List<String> statuses = process.getSupports().get(i).getBuilder().getSequence();
+      Assert.assertEquals(statuses.get(0), "fetching");
+      Assert.assertEquals(statuses.get(1), "branchCreation");
+      Assert.assertEquals(statuses.get(2), "checkouting");
+      if (i == 1) {
+        Assert.assertEquals(statuses.size(), 5);
+        Assert.assertEquals(statuses.get(3), "verif_MERGE_HEAD");
+        Assert.assertEquals(statuses.get(4), "merge_aborting");
+      }
+      else {
+        Assert.assertEquals(statuses.size(), 4);
+        Assert.assertEquals(statuses.get(3), "merging");
+      }
+    }
   }
 }

@@ -73,16 +73,13 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull
   @Override
   public BuildFinishedStatus waitFor() {
-    if (getStatus() == ResultStatus.FAILED) {
-      return BuildFinishedStatus.FINISHED_FAILED;
+    if (getStatus() == ResultStatus.SUCCESS) {
+      assert targetBranch != null;
+      myBuild.addSharedConfigParameter(PremergeConstants.SHARED_PARAM, targetBranch);
+      return BuildFinishedStatus.FINISHED_SUCCESS;
     }
     else {
-      if (getStatus() == ResultStatus.SUCCESS) {
-        assert targetBranch != null;
-        myBuild.addSharedConfigParameter(PremergeConstants.SHARED_PARAM, targetBranch);
-        return BuildFinishedStatus.FINISHED_SUCCESS;
-      }
-      return BuildFinishedStatus.FINISHED_WITH_PROBLEMS;
+      return BuildFinishedStatus.FINISHED_FAILED;
     }
   }
 
@@ -121,7 +118,9 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   }
 
   void setSuccess() {
-    status = ResultStatus.SUCCESS;
+    if (status != ResultStatus.FAILED) {
+      status = ResultStatus.SUCCESS;
+    }
   }
 
   void setUnsuccess() {

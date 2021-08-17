@@ -18,9 +18,15 @@ import org.jetbrains.annotations.Nullable;
 
 public class MockRunnerBuildBuilder {
   private int myBuildId = 0;
+  private int myVcsRootsCount = 1;
 
   public MockRunnerBuildBuilder setBuildId(int buildId) {
     myBuildId = buildId;
+    return this;
+  }
+
+  public MockRunnerBuildBuilder setVcsRootsCount(int vcsRootsCount) {
+    myVcsRootsCount = vcsRootsCount;
     return this;
   }
 
@@ -241,7 +247,9 @@ public class MockRunnerBuildBuilder {
       @Override
       public List<VcsRootEntry> getVcsRootEntries() {
         return new ArrayList<VcsRootEntry>() {{
-          add(new VcsRootEntry(new MockVcsRoot(), new CheckoutRules("no rules")));
+          for (int i = 0; i < myVcsRootsCount; ++i) {
+            add(new VcsRootEntry(new MockVcsRoot(), new CheckoutRules("no rules")));
+          }
         }};
       }
 
