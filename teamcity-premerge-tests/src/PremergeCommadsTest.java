@@ -70,6 +70,6 @@ public class PremergeCommadsTest {
     process.setBranchSuppoerClass(MockPremergeBranchSupport.class);
     process.start();
     process.waitFor();
-    System.out.println(process.getStatus());
+    Assert.assertEquals(process.getStatus().toString(), "SUCCESS");
   }
 }
