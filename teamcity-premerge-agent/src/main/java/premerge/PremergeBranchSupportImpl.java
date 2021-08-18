@@ -7,6 +7,7 @@ import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   @NotNull private final AgentGitFacade myFacade;
@@ -132,6 +133,8 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
     }
   }
 
+  @Nullable
+  @Override
   public String getParameter(String parameter) throws VcsException {
     return myFacade.revParse()
             .verify(parameter)

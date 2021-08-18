@@ -1,5 +1,7 @@
 package premerge;
 
+import java.util.HashMap;
+import java.util.Map;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildProcessAdapter;
@@ -19,6 +21,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final AgentRunningBuild myBuild;
   @NotNull private final BuildRunnerContext myRunner;
   private String targetBranch;
+  private Map<String, String> targetSHAs = new HashMap<>();
   private ResultStatus status = ResultStatus.SKIPPED;
 
   public enum ResultStatus {SUCCESS, SKIPPED, FAILED}
@@ -64,6 +67,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     branchSupport.createBranch(premergeBranch);
     branchSupport.checkout(premergeBranch);
     branchSupport.merge(targetBranch);
+    targetSHAs.put(root.getProperty("url"), branchSupport.getParameter(targetBranch));
   }
 
   protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root) throws VcsException {
@@ -75,7 +79,8 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   public BuildFinishedStatus waitFor() {
     if (getStatus() == ResultStatus.SUCCESS) {
       assert targetBranch != null;
-      myBuild.addSharedConfigParameter(PremergeConstants.SHARED_PARAM, targetBranch);
+      myBuild.addSharedConfigParameter(PremergeConstants.TARGET_BRANCH_SHARED_PARAM, targetBranch);
+      targetSHAs.forEach((root, sha) -> myBuild.addSharedConfigParameter(root, sha));
       return BuildFinishedStatus.FINISHED_SUCCESS;
     }
     else {

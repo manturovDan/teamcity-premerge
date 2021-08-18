@@ -2,6 +2,7 @@ package premerge;
 
 import jetbrains.buildServer.vcs.VcsException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface PremergeBranchSupport {
   @NotNull
@@ -17,4 +18,5 @@ public interface PremergeBranchSupport {
   public void createBranch(String branch) throws VcsException;
   public void merge(String branch) throws VcsException;
   @NotNull String constructBranchName();
+  @Nullable public String getParameter(String parameter) throws VcsException;
 }
