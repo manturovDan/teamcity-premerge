@@ -80,7 +80,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     if (getStatus() == ResultStatus.SUCCESS) {
       assert targetBranch != null;
       myBuild.addSharedConfigParameter(PremergeConstants.TARGET_BRANCH_SHARED_PARAM, targetBranch);
-      targetSHAs.forEach((root, sha) -> myBuild.addSharedConfigParameter(PremergeConstants.TARGET_SHA_SHARED_PARAM, root + ":" + sha));
+      targetSHAs.forEach((name, sha) -> myBuild.addSharedConfigParameter(PremergeConstants.TARGET_SHA_SHARED_PARAM + ":" + name, sha));
       return BuildFinishedStatus.FINISHED_SUCCESS;
     }
     else {

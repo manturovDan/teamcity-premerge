@@ -60,10 +60,11 @@ public class MultipleRootsTest {
     }
 
 
-    Assert.assertEquals(runningBuild.getSharedConfigParameters().size(), 2);
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().size(), 4);
     Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_BRANCH_SHARED_PARAM), "main");
-    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM), "git@...:merge_sha");
-
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM + ":git@...0"), "sha");
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM + ":git@...1"), "sha");
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM + ":git@...2"), "sha");
   }
 
   @Test

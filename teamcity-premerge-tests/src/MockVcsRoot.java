@@ -8,8 +8,12 @@ import org.jetbrains.annotations.Nullable;
 public class MockVcsRoot implements VcsRoot {
   private Map<String, String> properties = new HashMap<String, String>() {{
                                                                             put(Constants.FETCH_URL, "https://");
-                                                                            put("url", "git@...");
                                                                           }};
+  public VcsRoot setUrl(String url) {
+    properties.put("url", url);
+    return this;
+  }
+
   @NotNull
   @Override
   public String describe(boolean verbose) {

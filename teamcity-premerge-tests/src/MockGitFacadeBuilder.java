@@ -258,7 +258,7 @@ public class MockGitFacadeBuilder {
           @Override
           public String call() throws VcsException {
             sequence.add("verif_" + verified);
-            return "merge_sha";
+            return "sha";
           }
 
           @Override

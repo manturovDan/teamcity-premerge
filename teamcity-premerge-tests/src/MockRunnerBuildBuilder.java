@@ -247,7 +247,7 @@ public class MockRunnerBuildBuilder {
       public List<VcsRootEntry> getVcsRootEntries() {
         return new ArrayList<VcsRootEntry>() {{
           for (int i = 0; i < myVcsRootsCount; ++i) {
-            add(new VcsRootEntry(new MockVcsRoot(), new CheckoutRules("no rules")));
+            add(new VcsRootEntry(new MockVcsRoot().setUrl("git@..." + i), new CheckoutRules("no rules")));
           }
         }};
       }
