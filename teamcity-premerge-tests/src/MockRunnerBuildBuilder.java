@@ -1,8 +1,5 @@
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.agentServer.AgentBuild;
 import jetbrains.buildServer.artifacts.ArtifactDependencyInfo;
@@ -31,6 +28,8 @@ public class MockRunnerBuildBuilder {
   }
 
   AgentRunningBuild build() {
+    Map<String, String> sharedConfigParameters = new HashMap<>();
+
     return new AgentRunningBuild() {
       @NotNull
       @Override
@@ -82,12 +81,12 @@ public class MockRunnerBuildBuilder {
       @NotNull
       @Override
       public Map<String, String> getSharedConfigParameters() {
-        return null;
+        return sharedConfigParameters;
       }
 
       @Override
       public void addSharedConfigParameter(@NotNull String key, @NotNull String value) {
-
+        sharedConfigParameters.put(key, value);
       }
 
       @Override

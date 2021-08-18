@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import jetbrains.buildServer.vcs.VcsException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import premerge.PremergeBranchSupport;
 
 public class MockPremergeBranchSupportSuccess implements PremergeBranchSupport {
@@ -30,14 +31,21 @@ public class MockPremergeBranchSupportSuccess implements PremergeBranchSupport {
   @Override
   public void merge(String branch) throws VcsException {
     actionSequence.add("merged_" + branch);
-    myProcess.setTestStatus(
-      String.join(",", actionSequence)
-    );
   }
 
   @NotNull
   @Override
   public String constructBranchName() {
     return "premerge_branch";
+  }
+
+  @Nullable
+  @Override
+  public String getParameter(String parameter) throws VcsException {
+    actionSequence.add("asked_parameter_" + parameter);
+    myProcess.setTestStatus(
+      String.join(",", actionSequence)
+    );
+    return parameter + "_answer";
   }
 }

@@ -1,5 +1,3 @@
-package gitCommands;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +12,13 @@ import jetbrains.buildServer.buildTriggers.vcs.git.command.VersionCommand;
 import jetbrains.buildServer.buildTriggers.vcs.git.command.credentials.ScriptGen;
 import jetbrains.buildServer.vcs.VcsException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class MockGitFacadeBuilder {
   private boolean myFetchSuccess = true;
   private boolean myMergeSuccess = true;
   private boolean myAbortSuccess = true;
 
-  private List<String> sequence = new ArrayList<>();
+  private final List<String> sequence = new ArrayList<>();
 
   public List<String> getSequence() {
     return sequence;

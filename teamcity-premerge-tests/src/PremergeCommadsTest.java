@@ -49,7 +49,7 @@ public class PremergeCommadsTest {
     Assert.assertEquals(process.getTestStatus(), "NOT_STARTED");
     process.start();
     process.waitFor();
-    Assert.assertEquals(process.getTestStatus(), "fetched_main,branch_premerge_branch_created,checkouted_to_premerge_branch,merged_main");
+    Assert.assertEquals(process.getTestStatus(), "fetched_main,branch_premerge_branch_created,checkouted_to_premerge_branch,merged_main,asked_parameter_main");
   }
 
   @Test
@@ -79,11 +79,12 @@ public class PremergeCommadsTest {
     process.waitFor();
     Assert.assertEquals(process.getStatus().toString(), "SUCCESS");
     List<String> statuses = process.getSupports().get(0).getBuilder().getSequence();
-    Assert.assertEquals(statuses.size(), 4);
+    Assert.assertEquals(statuses.size(), 5);
     Assert.assertEquals(statuses.get(0), "fetching");
     Assert.assertEquals(statuses.get(1), "branchCreation");
     Assert.assertEquals(statuses.get(2), "checkouting");
     Assert.assertEquals(statuses.get(3), "merging");
+    Assert.assertEquals(statuses.get(4), "verif_main");
   }
 
   @Test
@@ -133,11 +134,12 @@ public class PremergeCommadsTest {
     Assert.assertEquals(process.waitFor().toString(), "FINISHED_FAILED");
     Assert.assertEquals(process.getStatus().toString(), "FAILED");
     List<String> statuses = process.getSupports().get(0).getBuilder().getSequence();
-    Assert.assertEquals(statuses.size(), 5);
+    Assert.assertEquals(statuses.size(), 6);
     Assert.assertEquals(statuses.get(0), "fetching");
     Assert.assertEquals(statuses.get(1), "branchCreation");
     Assert.assertEquals(statuses.get(2), "checkouting");
     Assert.assertEquals(statuses.get(3), "verif_MERGE_HEAD");
     Assert.assertEquals(statuses.get(4), "merge_aborting");
+    Assert.assertEquals(statuses.get(5), "verif_main");
   }
 }

@@ -6,6 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MockVcsRoot implements VcsRoot {
+  private Map<String, String> properties = new HashMap<String, String>() {{
+                                                                            put(Constants.FETCH_URL, "https://");
+                                                                            put("url", "git@...");
+                                                                          }};
   @NotNull
   @Override
   public String describe(boolean verbose) {
@@ -32,15 +36,13 @@ public class MockVcsRoot implements VcsRoot {
   @NotNull
   @Override
   public Map<String, String> getProperties() {
-    return new HashMap<String, String>() {{
-      put(Constants.FETCH_URL, "https://");
-    }};
+    return properties;
   }
 
   @Nullable
   @Override
   public String getProperty(@NotNull String propertyName) {
-    return null;
+    return properties.get(propertyName);
   }
 
   @Nullable

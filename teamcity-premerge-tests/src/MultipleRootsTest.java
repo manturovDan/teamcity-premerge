@@ -10,6 +10,7 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import premerge.PremergeConstants;
 
 public class MultipleRootsTest {
   private Mockery context;
@@ -50,12 +51,19 @@ public class MultipleRootsTest {
 
     for (int i = 0; i < process.getSupports().size(); ++i) {
       List<String> statuses = process.getSupports().get(i).getBuilder().getSequence();
-      Assert.assertEquals(statuses.size(), 4);
+      Assert.assertEquals(statuses.size(), 5);
       Assert.assertEquals(statuses.get(0), "fetching");
       Assert.assertEquals(statuses.get(1), "branchCreation");
       Assert.assertEquals(statuses.get(2), "checkouting");
       Assert.assertEquals(statuses.get(3), "merging");
+      Assert.assertEquals(statuses.get(4), "verif_main");
     }
+
+
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().size(), 2);
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_BRANCH_SHARED_PARAM), "main");
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM), "git@...:merge_sha");
+
   }
 
   @Test
@@ -77,13 +85,16 @@ public class MultipleRootsTest {
     Assert.assertEquals(process.getSupports().size(), 2);
 
     List<String> statuses0 = process.getSupports().get(0).getBuilder().getSequence();
-    Assert.assertEquals(statuses0.size(), 4);
+    Assert.assertEquals(statuses0.size(), 5);
     Assert.assertEquals(statuses0.get(0), "fetching");
     Assert.assertEquals(statuses0.get(1), "branchCreation");
     Assert.assertEquals(statuses0.get(2), "checkouting");
     Assert.assertEquals(statuses0.get(3), "merging");
+    Assert.assertEquals(statuses0.get(4), "verif_main");
 
     Assert.assertEquals(process.getSupports().get(1).getBuilder().getSequence().size(), 0);
+
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().size(), 0);
   }
 
   @Test
@@ -110,13 +121,15 @@ public class MultipleRootsTest {
       Assert.assertEquals(statuses.get(1), "branchCreation");
       Assert.assertEquals(statuses.get(2), "checkouting");
       if (i == 1) {
-        Assert.assertEquals(statuses.size(), 5);
+        Assert.assertEquals(statuses.size(), 6);
         Assert.assertEquals(statuses.get(3), "verif_MERGE_HEAD");
         Assert.assertEquals(statuses.get(4), "merge_aborting");
+        Assert.assertEquals(statuses.get(5), "verif_main");
       }
       else {
-        Assert.assertEquals(statuses.size(), 4);
+        Assert.assertEquals(statuses.size(), 5);
         Assert.assertEquals(statuses.get(3), "merging");
+        Assert.assertEquals(statuses.get(4), "verif_main");
       }
     }
   }
@@ -150,8 +163,9 @@ public class MultipleRootsTest {
         Assert.assertEquals(statuses.get(3), "verif_MERGE_HEAD");
       }
       else {
-        Assert.assertEquals(statuses.size(), 4);
+        Assert.assertEquals(statuses.size(), 5);
         Assert.assertEquals(statuses.get(3), "merging");
+        Assert.assertEquals(statuses.get(4), "verif_main");
       }
     }
   }
