@@ -12,7 +12,6 @@
   <artifactId>teamcity-premerge-agent</artifactId>
   <packaging>jar</packaging>
   <dependencies>
-    
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>teamcity-premerge-common</artifactId>
@@ -35,20 +34,17 @@
     </dependency>
 
     <dependency>
-      <groupId>local-agent</groupId>
-      <artifactId>org.jetbrains.teamcity.git.agent</artifactId>
-      <version>${teamcity-version}</version>
-      <scope>system</scope>
-      <systemPath>${teamcity.path.lib}/git-agent.jar</systemPath>
+      <groupId>org.jetbrains.teamcity.internal</groupId>
+      <artifactId>git-agent</artifactId>
+      <version>2021.2-20210818.160608-1</version>
     </dependency>
 
     <dependency>
-      <groupId>local-agent</groupId>
-      <artifactId>org.jetbrains.teamcity.git.common</artifactId>
-      <version>${teamcity-version}</version>
-      <scope>system</scope>
-      <systemPath>${teamcity.path.lib}/git-common.jar</systemPath>
+      <groupId>org.jetbrains.teamcity.internal</groupId>
+      <artifactId>git-common</artifactId>
+      <version>2021.2-20210818.160559-1</version>
     </dependency>
+
 
   </dependencies>
 
@@ -58,8 +54,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
     </plugins>
