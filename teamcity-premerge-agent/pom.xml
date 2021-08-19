@@ -41,8 +41,6 @@
       <artifactId>git-common</artifactId>
       <version>2021.2-SNAPSHOT</version>
     </dependency>
-
-
   </dependencies>
 
   <build>

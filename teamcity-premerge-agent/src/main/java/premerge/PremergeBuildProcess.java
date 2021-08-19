@@ -21,7 +21,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final AgentRunningBuild myBuild;
   @NotNull private final BuildRunnerContext myRunner;
   private String targetBranch;
-  private Map<String, String> targetSHAs = new HashMap<>();
+  private final Map<String, String> targetSHAs = new HashMap<>();
   private ResultStatus status = ResultStatus.SKIPPED;
 
   public enum ResultStatus {SUCCESS, SKIPPED, FAILED}
@@ -42,7 +42,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
 
   @Override
   public void start() {
-    myBuild.getBuildLogger().message("Preliminary merge fearture:");
+    myBuild.getBuildLogger().message("Preliminary merge build step:");
 
     try {
       preliminaryMerge();
