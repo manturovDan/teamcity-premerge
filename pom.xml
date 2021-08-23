@@ -12,10 +12,12 @@
     <repository>
       <id>space-maven</id>
       <url>https://packages.jetbrains.team/maven/p/tc/maven</url>
+      <snapshots><enabled>true</enabled></snapshots>
     </repository>
     <repository>
         <id>JetBrains</id>
         <url>https://download.jetbrains.com/teamcity-repository</url>
+      <snapshots><enabled>false</enabled></snapshots>
     </repository>
   </repositories>
   <pluginRepositories>

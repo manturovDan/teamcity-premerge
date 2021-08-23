@@ -2,10 +2,7 @@ package premerge;
 
 import java.util.HashMap;
 import java.util.Map;
-import jetbrains.buildServer.agent.AgentRunningBuild;
-import jetbrains.buildServer.agent.BuildFinishedStatus;
-import jetbrains.buildServer.agent.BuildProcessAdapter;
-import jetbrains.buildServer.agent.BuildRunnerContext;
+import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
 import jetbrains.buildServer.vcs.VcsException;
@@ -43,6 +40,11 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @Override
   public void start() {
     myBuild.getBuildLogger().message("Preliminary merge build step:");
+    if (myBuild.getEffectiveCheckoutMode() != AgentCheckoutMode.ON_AGENT) {
+      getBuild().getBuildLogger().error("Wrong checkout mode. This build step works only with agent-side checkout");
+      setUnsuccess();
+      return;
+    }
 
     try {
       preliminaryMerge();
