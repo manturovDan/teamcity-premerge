@@ -69,7 +69,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     branchSupport.createBranch(premergeBranch);
     branchSupport.checkout(premergeBranch);
     branchSupport.merge(targetBranch);
-    targetSHAs.put(root.getProperty("url"), branchSupport.getParameter(targetBranch));
+    targetSHAs.put(root.getExternalId(), branchSupport.getParameter(targetBranch));
   }
 
   protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root) throws VcsException {
@@ -82,7 +82,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     if (getStatus() == ResultStatus.SUCCESS) {
       assert targetBranch != null;
       myBuild.addSharedConfigParameter(PremergeConstants.TARGET_BRANCH_SHARED_PARAM, targetBranch);
-      targetSHAs.forEach((name, sha) -> myBuild.addSharedConfigParameter(PremergeConstants.TARGET_SHA_SHARED_PARAM + ":" + name, sha));
+      targetSHAs.forEach((name, sha) -> myBuild.addSharedConfigParameter(PremergeConstants.TARGET_SHA_SHARED_PARAM + "." + name, sha));
       return BuildFinishedStatus.FINISHED_SUCCESS;
     }
     else {
