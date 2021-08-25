@@ -5,6 +5,7 @@ import java.util.Map;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
+import jetbrains.buildServer.vcs.CheckoutRules;
 import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import jetbrains.buildServer.vcs.VcsRootEntry;
@@ -57,14 +58,15 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   protected void preliminaryMerge() throws VcsException {
     targetBranch = PremergeBranchSupport.cutRefsHeads(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
     for (VcsRootEntry entry : myBuild.getVcsRootEntries()) {
-      makeVcsRootPreliminaryMerge(entry.getVcsRoot());
+      makeVcsRootPreliminaryMerge(entry.getVcsRoot(), entry.getCheckoutRules().map("."));
     }
   }
 
-  protected void makeVcsRootPreliminaryMerge(VcsRoot root) throws VcsException {
-    PremergeBranchSupport branchSupport = createPremergeBranchSupport(root);
+  protected void makeVcsRootPreliminaryMerge(VcsRoot root, String repoRelativePath) throws VcsException {
+    PremergeBranchSupport branchSupport = createPremergeBranchSupport(root, repoRelativePath);
 
     String premergeBranch = branchSupport.constructBranchName();
+    getBuild().getBuildLogger().message("> " + root.getName());
     branchSupport.fetch(targetBranch);
     branchSupport.createBranch(premergeBranch);
     branchSupport.checkout(premergeBranch);
@@ -72,8 +74,8 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     targetSHAs.put(root.getExternalId(), branchSupport.getParameter(targetBranch));
   }
 
-  protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root) throws VcsException {
-    return new PremergeBranchSupportImpl(this, root);
+  protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root, String repoRelativePath) throws VcsException {
+    return new PremergeBranchSupportImpl(this, root, repoRelativePath);
   }
 
   @NotNull

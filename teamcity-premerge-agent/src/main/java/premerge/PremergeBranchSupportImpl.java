@@ -1,5 +1,6 @@
 package premerge;
 
+import java.io.File;
 import jetbrains.buildServer.buildTriggers.vcs.git.AuthSettings;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
@@ -17,12 +18,13 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   @NotNull private final AgentGitVcsRoot myVcsRoot;
 
   public PremergeBranchSupportImpl(@NotNull PremergeBuildProcess process,
-                                   @NotNull VcsRoot root) throws VcsException {
+                                   @NotNull VcsRoot root,
+                                   @NotNull String repoRelativePath) throws VcsException {
     myRoot = root;
     myProcess = process;
     myConfig = createPluginConfig();
     myVcsRoot = createGitVcsRoot(root);
-    myFacade = getFacade();
+    myFacade = getFacade(repoRelativePath);
   }
 
   protected AgentPluginConfig createPluginConfig() throws VcsException {
@@ -34,9 +36,13 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   }
 
   protected AgentGitFacade getFacade() {
+    return getFacade("");
+  }
+
+  protected AgentGitFacade getFacade(String repoRelativePath) {
     GitFactory gitFactory = myProcess.getGitMetaFactory().createFactory(myProcess.getSshService(),
                                                                         new BuildContext(myProcess.getBuild(), myConfig));
-    return gitFactory.create(myProcess.getBuild().getCheckoutDirectory());
+    return gitFactory.create(new File(myProcess.getBuild().getCheckoutDirectory().getAbsolutePath() + "/" + repoRelativePath));
   }
 
   protected AuthSettings retrieveAuthSettings() {
