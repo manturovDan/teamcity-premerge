@@ -62,7 +62,8 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
               .setAuthSettings(retrieveAuthSettings())
               .setUseNativeSsh(myConfig.isUseNativeSSH())
               .setTimeout(getTimeout())
-              .setRefspec("+" + branch + ":" + branch)
+              //.setRefspec("+" + branch + ":" + branch)
+              .setRefspec(branch)
               .setFetchTags(myConfig.isFetchTags())
               .setQuite(true)
               .call();
