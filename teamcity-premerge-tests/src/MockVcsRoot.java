@@ -28,7 +28,7 @@ public class MockVcsRoot implements VcsRoot {
   @NotNull
   @Override
   public String getName() {
-    return null;
+    return "TestRoot";
   }
 
   @NotNull
@@ -58,6 +58,6 @@ public class MockVcsRoot implements VcsRoot {
   @NotNull
   @Override
   public String getExternalId() {
-    return null;
+    return "ex_id";
   }
 }

@@ -70,7 +70,7 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
     return myTestStatus;
   }
 
-  protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root) throws VcsException {
+  protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root, String checkoutDir) throws VcsException {
     if (myBranchSupportClass.equals(MockPremergeBranchSupportSuccess.class)) {
       branchSupportCounter++;
       return new MockPremergeBranchSupportSuccess(this);

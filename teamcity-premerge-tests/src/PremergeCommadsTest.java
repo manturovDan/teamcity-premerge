@@ -1,10 +1,13 @@
 import java.util.List;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildRunnerContext;
+import jetbrains.buildServer.buildTriggers.vcs.git.GitUtils;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactory;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactory;
+import jetbrains.buildServer.vcs.CheckoutRules;
+import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.testng.Assert;
@@ -36,6 +39,8 @@ public class PremergeCommadsTest {
   @Test
   public void processTest() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setBuildId(780).build();
+    runningBuild.addSharedConfigParameter(GitUtils.getGitRootBranchParamName(
+      new VcsRootEntry(new MockVcsRoot().setUrl("git@...0"), new CheckoutRules(".")).getVcsRoot()), "refs/heads/feature_X");
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
     MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
                                                                     sshService,
