@@ -17,7 +17,7 @@ public class MockPremergeBranchSupport extends PremergeBranchSupportImpl {
 
   public MockPremergeBranchSupport(@NotNull PremergeBuildProcess process,
                                    @NotNull VcsRoot root) throws VcsException {
-    super(process, root);
+    super(process, root, "");
   }
 
   @Override

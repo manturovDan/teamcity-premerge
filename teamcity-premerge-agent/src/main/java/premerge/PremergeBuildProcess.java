@@ -3,12 +3,13 @@ package premerge;
 import java.util.HashMap;
 import java.util.Map;
 import jetbrains.buildServer.agent.*;
+import jetbrains.buildServer.buildTriggers.vcs.git.GitUtils;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
-import jetbrains.buildServer.vcs.CheckoutRules;
 import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import jetbrains.buildServer.vcs.VcsRootEntry;
+import jetbrains.buildServer.vcs.VcsUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class PremergeBuildProcess extends BuildProcessAdapter {
@@ -67,11 +68,18 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
 
     String premergeBranch = branchSupport.constructBranchName();
     getBuild().getBuildLogger().message("> " + root.getName());
-    branchSupport.fetch(targetBranch);
-    branchSupport.createBranch(premergeBranch);
-    branchSupport.checkout(premergeBranch);
-    branchSupport.merge(targetBranch);
-    targetSHAs.put(root.getExternalId(), branchSupport.getParameter(targetBranch));
+
+    String rootBranch = getBuild().getSharedConfigParameters().get(GitUtils.getGitRootBranchParamName(root));
+    if (PremergeBranchSupport.cutRefsHeads(rootBranch).equals(targetBranch)) {
+      getBuild().getBuildLogger().warning("Current branch is the same as the target branch. Skipping VcsRoot.");
+    }
+    else {
+      branchSupport.fetch(targetBranch);
+      branchSupport.createBranch(premergeBranch);
+      branchSupport.checkout(premergeBranch);
+      branchSupport.merge(targetBranch);
+      targetSHAs.put(root.getExternalId(), branchSupport.getParameter(targetBranch));
+    }
   }
 
   protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root, String repoRelativePath) throws VcsException {
