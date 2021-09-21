@@ -1,1 +1,5 @@
+premerge/PremergeBranchSupport.class
+premerge/PremergeBuildProcess$ResultStatus.class
+premerge/PremergeBuildProcess.class
 premerge/PremergeBuildRunner.class
+premerge/PremergeBranchSupportImpl.class

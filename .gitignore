@@ -1,0 +1,5 @@
+build/*
+target/*
+teamcity-premerge-agent/target/*
+teamcity-premerge-common/target/*
+teamcity-premerge-server/target/*
