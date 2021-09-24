@@ -5,10 +5,7 @@ import java.util.Map;
 import jetbrains.buildServer.buildTriggers.vcs.git.AuthSettings;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.AgentGitFacade;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.command.*;
-import jetbrains.buildServer.buildTriggers.vcs.git.command.FetchCommand;
-import jetbrains.buildServer.buildTriggers.vcs.git.command.LsRemoteCommand;
-import jetbrains.buildServer.buildTriggers.vcs.git.command.RemoteCommand;
-import jetbrains.buildServer.buildTriggers.vcs.git.command.VersionCommand;
+import jetbrains.buildServer.buildTriggers.vcs.git.command.*;
 import jetbrains.buildServer.buildTriggers.vcs.git.command.credentials.ScriptGen;
 import jetbrains.buildServer.vcs.VcsException;
 import org.jetbrains.annotations.NotNull;
@@ -121,6 +118,12 @@ public class MockGitFacadeBuilder {
       @NotNull
       @Override
       public UpdateRefCommand updateRef() {
+        return null;
+      }
+
+      @NotNull
+      @Override
+      public TagCommand tag() {
         return null;
       }
 
@@ -532,6 +535,12 @@ public class MockGitFacadeBuilder {
       @NotNull
       @Override
       public RemoteCommand remote() {
+        return null;
+      }
+
+      @NotNull
+      @Override
+      public PushCommand push() {
         return null;
       }
     };

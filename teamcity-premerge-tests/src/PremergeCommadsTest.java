@@ -2,12 +2,16 @@ import java.util.List;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitUtils;
+import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
+import jetbrains.buildServer.buildTriggers.vcs.git.agent.AgentPluginConfig;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactory;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactory;
+import jetbrains.buildServer.buildTriggers.vcs.git.command.Context;
 import jetbrains.buildServer.vcs.CheckoutRules;
 import jetbrains.buildServer.vcs.VcsRootEntry;
+import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.testng.Assert;
@@ -67,6 +71,8 @@ public class PremergeCommadsTest {
   @Test
   public void successfulPremergeTest() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setBuildId(780).build();
+    runningBuild.addSharedConfigParameter(GitUtils.getGitRootBranchParamName(
+      new VcsRootEntry(new MockVcsRoot().setUrl("git@...0"), new CheckoutRules(".")).getVcsRoot()), "refs/heads/feature_X");
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
 
     Assert.assertEquals(runningBuild.getBuildId(), 780);
@@ -95,6 +101,8 @@ public class PremergeCommadsTest {
   @Test
   public void FetchErrorTest() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setBuildId(780).build();
+    runningBuild.addSharedConfigParameter(GitUtils.getGitRootBranchParamName(
+      new VcsRootEntry(new MockVcsRoot().setUrl("git@...0"), new CheckoutRules(".")).getVcsRoot()), "refs/heads/feature_X");
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
 
     Assert.assertEquals(runningBuild.getBuildId(), 780);
@@ -120,6 +128,8 @@ public class PremergeCommadsTest {
   @Test
   public void conflictTest() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setBuildId(780).build();
+    runningBuild.addSharedConfigParameter(GitUtils.getGitRootBranchParamName(
+      new VcsRootEntry(new MockVcsRoot().setUrl("git@...0"), new CheckoutRules(".")).getVcsRoot()), "refs/heads/feature_X");
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
 
     Assert.assertEquals(runningBuild.getBuildId(), 780);

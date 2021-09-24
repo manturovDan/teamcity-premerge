@@ -87,4 +87,10 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
     branchSupportCounter++;
     return null;
   }
+
+  @NotNull
+  @Override
+  public GitMetaFactory getGitMetaFactory() {
+    return super.getGitMetaFactory();
+  }
 }

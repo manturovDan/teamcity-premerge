@@ -25,6 +25,11 @@ public class MockPremergeBranchSupport extends PremergeBranchSupportImpl {
     return getBuilder().build();
   }
 
+  @Override
+  protected AgentGitFacade getFacade(String repoRelativePath) {
+    return getBuilder().build();
+  }
+
   public MockGitFacadeBuilder getBuilder() {
     if (myBuilder == null)
       myBuilder = new MockGitFacadeBuilder();
@@ -42,6 +47,7 @@ public class MockPremergeBranchSupport extends PremergeBranchSupportImpl {
       allowing(config).getIdleTimeoutSeconds(); will(returnValue(0));
       allowing(config).getGitVersion(); will(returnValue(new GitVersion(10, 10, 10)));
       allowing(config).isFetchTags(); will(returnValue(false));
+      allowing(config).getGitProgressMode(); will(returnValue(AgentPluginConfig.GitProgressMode.DEBUG));
     }});
 
     return config;

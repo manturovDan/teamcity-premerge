@@ -1,10 +1,13 @@
 import java.util.List;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildRunnerContext;
+import jetbrains.buildServer.buildTriggers.vcs.git.GitUtils;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactory;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactory;
+import jetbrains.buildServer.vcs.CheckoutRules;
+import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.testng.Assert;
@@ -35,6 +38,8 @@ public class MultipleRootsTest {
   @Test
   public void multipleVcsRootsSuccess() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
+    runningBuild.addSharedConfigParameter(GitUtils.getGitRootBranchParamName(
+      new VcsRootEntry(new MockVcsRoot().setUrl("git@...0"), new CheckoutRules(".")).getVcsRoot()), "refs/heads/feature_X");
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
     MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
                                                                     sshService,
@@ -59,17 +64,18 @@ public class MultipleRootsTest {
       Assert.assertEquals(statuses.get(4), "verif_main");
     }
 
-
-    Assert.assertEquals(runningBuild.getSharedConfigParameters().size(), 4);
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().size(), 5);
     Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_BRANCH_SHARED_PARAM), "main");
-    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM + ":git@...0"), "sha");
-    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM + ":git@...1"), "sha");
-    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM + ":git@...2"), "sha");
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM + ".git@...0"), "sha");
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM + ".git@...1"), "sha");
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().get(PremergeConstants.TARGET_SHA_SHARED_PARAM + ".git@...2"), "sha");
   }
 
   @Test
   public void multipleVcsFetchError() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
+    runningBuild.addSharedConfigParameter(GitUtils.getGitRootBranchParamName(
+      new VcsRootEntry(new MockVcsRoot().setUrl("git@...0"), new CheckoutRules(".")).getVcsRoot()), "refs/heads/feature_X");
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
     MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
                                                                     sshService,
@@ -95,12 +101,14 @@ public class MultipleRootsTest {
 
     Assert.assertEquals(process.getSupports().get(1).getBuilder().getSequence().size(), 0);
 
-    Assert.assertEquals(runningBuild.getSharedConfigParameters().size(), 0);
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().size(), 1);
   }
 
   @Test
   public void multipleVcsConflictError() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
+    runningBuild.addSharedConfigParameter(GitUtils.getGitRootBranchParamName(
+      new VcsRootEntry(new MockVcsRoot().setUrl("git@...0"), new CheckoutRules(".")).getVcsRoot()), "refs/heads/feature_X");
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
     MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
                                                                     sshService,
@@ -138,6 +146,8 @@ public class MultipleRootsTest {
   @Test
   public void multipleVcsAbortError() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setVcsRootsCount(3).setBuildId(780).build();
+    runningBuild.addSharedConfigParameter(GitUtils.getGitRootBranchParamName(
+      new VcsRootEntry(new MockVcsRoot().setUrl("git@...0"), new CheckoutRules(".")).getVcsRoot()), "refs/heads/feature_X");
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
     MockPremergeBuildProcess process = new MockPremergeBuildProcess(configFactory,
                                                                     sshService,

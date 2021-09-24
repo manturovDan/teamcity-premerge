@@ -58,6 +58,6 @@ public class MockVcsRoot implements VcsRoot {
   @NotNull
   @Override
   public String getExternalId() {
-    return "ex_id";
+    return properties.get("url");
   }
 }
