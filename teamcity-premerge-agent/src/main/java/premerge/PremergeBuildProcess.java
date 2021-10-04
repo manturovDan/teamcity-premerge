@@ -1,6 +1,7 @@
 package premerge;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitUtils;
@@ -21,6 +22,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   private String targetBranch;
   private final Map<String, String> targetSHAs = new HashMap<>();
   private ResultStatus status = ResultStatus.SKIPPED;
+  private int unsuccessfulFetchesCount = 0;
 
   public enum ResultStatus {SUCCESS, SKIPPED, FAILED}
 
@@ -57,8 +59,15 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
 
   protected void preliminaryMerge() throws VcsException {
     targetBranch = PremergeBranchSupport.cutRefsHeads(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
-    for (VcsRootEntry entry : myBuild.getVcsRootEntries()) {
+    List<VcsRootEntry> vcsRootEntries = myBuild.getVcsRootEntries();
+    for (VcsRootEntry entry : vcsRootEntries) {
       makeVcsRootPreliminaryMerge(entry.getVcsRoot(), entry.getCheckoutRules().map("."));
+    }
+
+    if (unsuccessfulFetchesCount == vcsRootEntries.size()) {
+      getBuild().getBuildLogger().error("Fetching all target branches error");
+      setUnsuccess();
+      throw new VcsException("Fetching all target branches error");
     }
   }
 
@@ -73,11 +82,22 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       getBuild().getBuildLogger().warning("Current branch is the same as the target branch. Skipping VcsRoot.");
     }
     else {
-      branchSupport.fetch(targetBranch);
-      branchSupport.createBranch(premergeBranch);
-      branchSupport.checkout(premergeBranch);
-      branchSupport.merge(targetBranch);
-      targetSHAs.put(root.getExternalId(), branchSupport.getParameter(targetBranch));
+      try {
+        branchSupport.fetch(targetBranch);
+      } catch (VcsException e) {
+        unsuccessfulFetchesCount++;
+        return;
+      }
+
+      try {
+        branchSupport.createBranch(premergeBranch);
+        branchSupport.checkout(premergeBranch);
+        branchSupport.merge(targetBranch);
+        targetSHAs.put(root.getExternalId(), branchSupport.getParameter(targetBranch));
+      } catch (VcsException ex) {
+        setUnsuccess();
+        throw ex;
+      }
     }
   }
 

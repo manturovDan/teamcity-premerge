@@ -67,8 +67,7 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
               .setQuite(true)
               .call();
     } catch (Exception e) {
-      myProcess.getBuild().getBuildLogger().error("Fetching '" + branch + "' error");
-      myProcess.setUnsuccess();
+      myProcess.getBuild().getBuildLogger().warning("Fetching '" + branch + "' error");
       throw new VcsException(e);
     }
     myProcess.getBuild().getBuildLogger().message("'" + branch + "' fetched");
@@ -85,7 +84,6 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
               .call();
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Checkout to '" + branch + "' error");
-      myProcess.setUnsuccess();
       throw new VcsException(e);
     }
     myProcess.getBuild().getBuildLogger().message("Checkout to '" + branch + "'");
@@ -99,7 +97,6 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
               .call();
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Creating '" + branch + "' error");
-      myProcess.setUnsuccess();
       throw new VcsException(e);
     }
     myProcess.getBuild().getBuildLogger().message("Created '" + branch + "'");
@@ -115,12 +112,11 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
       myProcess.setSuccess();
     } catch (VcsException vcsException) {
       String mergeCommits = getParameter("MERGE_HEAD");
-      myProcess.setUnsuccess();
       if (!StringUtil.isEmpty(mergeCommits)) {
         myProcess.getBuild().getBuildLogger().warning("Preliminary merge conflict with branch '" + branch + "'");
         mergeAbort();
-        return;
       }
+      throw vcsException;
     } catch (Exception e) {
       myProcess.getBuild().getBuildLogger().error("Merging '" + branch +"' error");
       throw new VcsException(e);
