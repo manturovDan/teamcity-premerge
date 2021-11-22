@@ -2,18 +2,18 @@
 <dsl-extension kind="buildStep" type="preliminaryMerge" generateDslJar="true">
   <class name = "PreliminaryMerge">
     <description>
-      A build step, which makes preliminary merge (todo update)
+      This plugin allows running builds on merge results before the merge was committed. It helps to detect integration problems.
     </description>
   </class>
   <function name = "preliminaryMerge">
     <description>
-      Enables Preliminary Merge build Step
+      Enables Preliminary Merge Build Step
     </description>
   </function>
   <params>
     <param name="tar.br" dslName="targetBranchName">
       <description>
-        Set a target branch name (todo update)
+        Target branch name
       </description>
     </param>
   </params>
