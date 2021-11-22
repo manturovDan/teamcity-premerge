@@ -87,9 +87,9 @@ public class MultipleRootsTest {
     process.setFetchSuccess(false, 1);
     process.setBranchSupportClass(MockPremergeBranchSupport.class);
     process.start();
-    Assert.assertEquals(process.waitFor().toString(), "FINISHED_FAILED");
-    Assert.assertEquals(process.getStatus().toString(), "FAILED");
-    Assert.assertEquals(process.getSupports().size(), 2);
+    Assert.assertEquals(process.waitFor().toString(), "FINISHED_SUCCESS");
+    Assert.assertEquals(process.getStatus().toString(), "SUCCESS");
+    Assert.assertEquals(process.getSupports().size(), 3);
 
     List<String> statuses0 = process.getSupports().get(0).getBuilder().getSequence();
     Assert.assertEquals(statuses0.size(), 5);
@@ -101,7 +101,15 @@ public class MultipleRootsTest {
 
     Assert.assertEquals(process.getSupports().get(1).getBuilder().getSequence().size(), 0);
 
-    Assert.assertEquals(runningBuild.getSharedConfigParameters().size(), 1);
+    List<String> statuses2 = process.getSupports().get(2).getBuilder().getSequence();
+    Assert.assertEquals(statuses2.size(), 5);
+    Assert.assertEquals(statuses2.get(0), "fetching");
+    Assert.assertEquals(statuses2.get(1), "branchCreation");
+    Assert.assertEquals(statuses2.get(2), "checkouting");
+    Assert.assertEquals(statuses2.get(3), "merging");
+    Assert.assertEquals(statuses2.get(4), "verif_main");
+
+    Assert.assertEquals(runningBuild.getSharedConfigParameters().size(), 4);
   }
 
   @Test
@@ -122,7 +130,7 @@ public class MultipleRootsTest {
     process.start();
     Assert.assertEquals(process.waitFor().toString(), "FINISHED_FAILED");
     Assert.assertEquals(process.getStatus().toString(), "FAILED");
-    Assert.assertEquals(process.getSupports().size(), 3);
+    Assert.assertEquals(process.getSupports().size(), 2);
 
     for (int i = 0; i < process.getSupports().size(); i++) {
       List<String> statuses = process.getSupports().get(i).getBuilder().getSequence();
@@ -130,10 +138,9 @@ public class MultipleRootsTest {
       Assert.assertEquals(statuses.get(1), "branchCreation");
       Assert.assertEquals(statuses.get(2), "checkouting");
       if (i == 1) {
-        Assert.assertEquals(statuses.size(), 6);
+        Assert.assertEquals(statuses.size(), 5);
         Assert.assertEquals(statuses.get(3), "verif_MERGE_HEAD");
         Assert.assertEquals(statuses.get(4), "merge_aborting");
-        Assert.assertEquals(statuses.get(5), "verif_main");
       }
       else {
         Assert.assertEquals(statuses.size(), 5);

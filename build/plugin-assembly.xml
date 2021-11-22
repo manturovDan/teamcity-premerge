@@ -13,7 +13,11 @@
      <file>
          <source>target/teamcity-premerge-agent.zip</source>
          <outputDirectory>agent</outputDirectory>
-     </file> 
+     </file>
+    <file>
+      <source>../kotlin-dsl/PreliminaryMerge.xml</source>
+      <outputDirectory>/kotlin-dsl/</outputDirectory>
+    </file>
   </files>
   <moduleSets>
     <moduleSet>

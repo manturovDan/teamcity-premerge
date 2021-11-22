@@ -149,12 +149,11 @@ public class PremergeCommadsTest {
     Assert.assertEquals(process.waitFor().toString(), "FINISHED_FAILED");
     Assert.assertEquals(process.getStatus().toString(), "FAILED");
     List<String> statuses = process.getSupports().get(0).getBuilder().getSequence();
-    Assert.assertEquals(statuses.size(), 6);
+    Assert.assertEquals(statuses.size(), 5);
     Assert.assertEquals(statuses.get(0), "fetching");
     Assert.assertEquals(statuses.get(1), "branchCreation");
     Assert.assertEquals(statuses.get(2), "checkouting");
     Assert.assertEquals(statuses.get(3), "verif_MERGE_HEAD");
     Assert.assertEquals(statuses.get(4), "merge_aborting");
-    Assert.assertEquals(statuses.get(5), "verif_main");
   }
 }
