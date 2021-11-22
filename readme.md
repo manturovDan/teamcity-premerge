@@ -13,3 +13,5 @@ There are two ways to configure this plugin:
 2. Most Git-services don't provide the merge-commits of (Merge|Pull)-requests explicitly or don't recommend using them (e.g. GitHub). So, if you want to run the build on the merge commit you should use [Pull Request plugin](https://www.jetbrains.com/help/teamcity/pull-requests.html) integration. You should type _%teamcity.pullRequest.target.branch%_ into **Target branch** field and add necessary condition: _teamcity.pullRequest.target.branch exists_. ![](resources/pm_screen2.png)
 
 This plugin also works with several VCS-roots. When _Build Branch_ isn't found it falls back to the ```<default>``` branch. When it exists, preliminary merge commit with target branch creates.
+
+TODO write about Azure DevOps and multiple vcs roots
