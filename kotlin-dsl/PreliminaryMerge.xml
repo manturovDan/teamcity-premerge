@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dsl-extension kind="buildStep" type="preliminaryMerge" generateDslJar="true">
+  <class name = "PreliminaryMerge">
+    <description>
+      A build step, which makes preliminary merge (todo update)
+    </description>
+  </class>
+  <function name = "preliminaryMerge">
+    <description>
+      Enables Preliminary Merge build Step
+    </description>
+  </function>
+  <params>
+    <param name="tar.br" dslName="targetBranchName">
+      <description>
+        Set a target branch name (todo update)
+      </description>
+    </param>
+  </params>
+</dsl-extension>
