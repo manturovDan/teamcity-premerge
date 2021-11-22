@@ -17,6 +17,7 @@ public interface PremergeBranchSupport {
   public void checkout(String branch) throws VcsException;
   public void createBranch(String branch) throws VcsException;
   public void merge(String branch) throws VcsException;
+  public void setUser() throws VcsException;
   @NotNull String constructBranchName();
   @Nullable public String getParameter(String parameter) throws VcsException;
 }

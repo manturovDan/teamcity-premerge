@@ -4,6 +4,7 @@ import java.io.File;
 import jetbrains.buildServer.buildTriggers.vcs.git.AuthSettings;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
+import jetbrains.buildServer.buildTriggers.vcs.git.agent.command.SetConfigCommand;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
@@ -141,6 +142,14 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
     return myFacade.revParse()
             .verify(parameter)
             .call();
+  }
+
+  @Override
+  public void setUser() throws VcsException {
+    SetConfigCommand setConfig = myFacade.setConfig();
+    setConfig.addConfig("user.name", "premergeRobot");
+    setConfig.addConfig("user.email", "premerge@jetbrains.com");
+    setConfig.call();
   }
 
   public int getTimeout() {
