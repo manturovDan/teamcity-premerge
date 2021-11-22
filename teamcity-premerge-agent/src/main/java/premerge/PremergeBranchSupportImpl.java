@@ -108,8 +108,8 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   public void merge(String branch) throws VcsException {
     try {
       MergeCommand mergeCommand = myFacade.merge();
-      mergeCommand.setEnv("author.name", "Premerge Robot");
-      mergeCommand.setEnv("author.email", "premerge.plugin@jetbrains.com");
+      mergeCommand.addConfig("user.name", "PremergeRobot");
+      mergeCommand.addConfig("user.email", "premerge.plugin@jetbrains.com");
       mergeCommand.setBranches(branch)
                   .setQuiet(true)
                   .call();
@@ -145,14 +145,6 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
     return myFacade.revParse()
             .verify(parameter)
             .call();
-  }
-
-  @Override
-  public void setUser() throws VcsException {
-    SetConfigCommand setConfig = myFacade.setConfig();
-    setConfig.addConfig("user.name", "premergeRobot");
-    setConfig.addConfig("user.email", "premerge@jetbrains.com");
-    setConfig.call();
   }
 
   public int getTimeout() {

@@ -33,11 +33,6 @@ public class MockPremergeBranchSupportSuccess implements PremergeBranchSupport {
     actionSequence.add("merged_" + branch);
   }
 
-  @Override
-  public void setUser() throws VcsException {
-    //todo
-  }
-
   @NotNull
   @Override
   public String constructBranchName() {
