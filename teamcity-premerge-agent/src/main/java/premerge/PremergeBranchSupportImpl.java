@@ -4,6 +4,7 @@ import java.io.File;
 import jetbrains.buildServer.buildTriggers.vcs.git.AuthSettings;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
+import jetbrains.buildServer.buildTriggers.vcs.git.agent.command.MergeCommand;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.command.SetConfigCommand;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.vcs.VcsException;
@@ -106,10 +107,12 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   @Override
   public void merge(String branch) throws VcsException {
     try {
-      myFacade.merge()
-              .setBranches(branch)
-              .setQuiet(true)
-              .call();
+      MergeCommand mergeCommand = myFacade.merge();
+      mergeCommand.setEnv("author.name", "Premerge Robot");
+      mergeCommand.setEnv("author.email", "premerge.plugin@jetbrains.com");
+      mergeCommand.setBranches(branch)
+                  .setQuiet(true)
+                  .call();
       myProcess.setSuccess();
     } catch (VcsException vcsException) {
       String mergeCommits = getParameter("MERGE_HEAD");

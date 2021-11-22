@@ -90,7 +90,6 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       }
 
       try {
-        branchSupport.setUser();
         branchSupport.createBranch(premergeBranch);
         branchSupport.checkout(premergeBranch);
         branchSupport.merge(targetBranch);
