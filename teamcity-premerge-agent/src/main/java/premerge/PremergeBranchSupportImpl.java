@@ -21,12 +21,12 @@ import jetbrains.buildServer.buildTriggers.vcs.git.AuthSettings;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.command.MergeCommand;
-import jetbrains.buildServer.buildTriggers.vcs.git.agent.command.SetConfigCommand;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import jetbrains.buildServer.agent.oauth.AgentTokenStorage;
 
 public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   @NotNull private final AgentGitFacade myFacade;
@@ -50,7 +50,7 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   }
 
   protected AgentGitVcsRoot createGitVcsRoot(VcsRoot root) throws VcsException {
-    return new AgentGitVcsRoot(myProcess.getMirrorManager(), myProcess.getBuild().getCheckoutDirectory(), root);
+    return new AgentGitVcsRoot(myProcess.getMirrorManager(), myProcess.getBuild().getCheckoutDirectory(), root, null);
   }
 
   protected AgentGitFacade getFacade() {

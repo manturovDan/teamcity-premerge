@@ -8,9 +8,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="premerge-common" exported="" />
-    <orderEntry type="module" module-name="server-openapi" exported="" />
-    <orderEntry type="module" module-name="web-openapi" exported="" />
-    <orderEntry type="module" module-name="common" exported="" />
+    <orderEntry type="module" module-name="server-common-api" />
+    <orderEntry type="module" module-name="server-openapi" />
+    <orderEntry type="module" module-name="premerge-common" />
   </component>
 </module>

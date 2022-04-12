@@ -54,7 +54,7 @@ public class PremergeBuildRunner implements AgentBuildRunner, AgentBuildRunnerIn
   @NotNull
   @Override
   public String getType() {
-    return PremergeConstants.TYPE;
+    return premerge.PremergeConstants.TYPE;
   }
 
   @Override
