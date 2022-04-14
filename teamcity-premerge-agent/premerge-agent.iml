@@ -12,5 +12,7 @@
     <orderEntry type="module" module-name="git-agent-internal" />
     <orderEntry type="module" module-name="premerge-common" />
     <orderEntry type="module" module-name="oauth-integration-agent" />
+    <orderEntry type="module" module-name="pull-requests" />
+    <orderEntry type="module" module-name="server-startup" />
   </component>
 </module>

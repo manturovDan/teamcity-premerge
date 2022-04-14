@@ -16,11 +16,13 @@
 
 package premerge;
 
+import java.io.IOException;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactory;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactory;
+import jetbrains.buildServer.http.HttpApi;
 import org.jetbrains.annotations.NotNull;
 
 public class PremergeBuildRunner implements AgentBuildRunner, AgentBuildRunnerInfo {
@@ -28,21 +30,24 @@ public class PremergeBuildRunner implements AgentBuildRunner, AgentBuildRunnerIn
   @NotNull private final GitAgentSSHService mySshService;
   @NotNull private final PluginConfigFactory myConfigFactory;
   @NotNull private final MirrorManager myMirrorManager;
+  @NotNull private final HttpApi myHttpApi;
 
   public PremergeBuildRunner(@NotNull GitMetaFactory gitMetaFactory,
                              @NotNull GitAgentSSHService sshService,
                              @NotNull PluginConfigFactory configFactory,
-                             @NotNull MirrorManager mirrorManager) {
+                             @NotNull MirrorManager mirrorManager,
+                             @NotNull HttpApi httpApi) {
     myGitMetaFactory = gitMetaFactory;
     mySshService = sshService;
     myConfigFactory = configFactory;
     myMirrorManager = mirrorManager;
+    myHttpApi = httpApi;
   }
 
   @NotNull
   @Override
   public BuildProcess createBuildProcess(@NotNull AgentRunningBuild runningBuild, @NotNull BuildRunnerContext context) {
-    return new PremergeBuildProcess(myConfigFactory, mySshService, myGitMetaFactory, myMirrorManager, runningBuild, context);
+   return new PremergeBuildProcess(myConfigFactory, mySshService, myGitMetaFactory, myMirrorManager, myHttpApi, runningBuild, context);
   }
 
   @NotNull

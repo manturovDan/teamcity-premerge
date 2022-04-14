@@ -41,7 +41,7 @@ public class PremergeRunType extends RunType {
   @NotNull
   @Override
   public String getType() {
-    return PremergeConstants.TYPE;
+    return premerge.PremergeConstants.TYPE;
   }
 
   @NotNull

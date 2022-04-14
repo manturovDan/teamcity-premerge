@@ -23,10 +23,13 @@ import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitUtils;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
+import jetbrains.buildServer.http.HttpApi;
 import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
+import trains.PullRequestsFetcher;
+import trains.impl.github.GitHubPullRequestsFetcher;
 
 public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final PluginConfigFactory myConfigFactory;
@@ -35,6 +38,8 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final MirrorManager myMirrorManager;
   @NotNull private final AgentRunningBuild myBuild;
   @NotNull private final BuildRunnerContext myRunner;
+  @NotNull private final HttpApi myHttpApi;
+
   private String targetBranch;
   private final Map<String, String> targetSHAs = new HashMap<>();
   private ResultStatus status = ResultStatus.SKIPPED;
@@ -46,6 +51,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
                               @NotNull GitAgentSSHService sshService,
                               @NotNull GitMetaFactory gitMetaFactory,
                               @NotNull MirrorManager mirrorManager,
+                              @NotNull HttpApi httpApi,
                               @NotNull AgentRunningBuild build,
                               @NotNull BuildRunnerContext runner) {
     myConfigFactory = configFactory;
@@ -54,16 +60,20 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     myMirrorManager = mirrorManager;
     myBuild = build;
     myRunner = runner;
+    myHttpApi = httpApi;
   }
 
   @Override
   public void start() {
-    myBuild.getBuildLogger().message("Preliminary merge build step:");
+    myBuild.getBuildLogger().message("Merge Train start build step:");
     if (myBuild.getEffectiveCheckoutMode() != AgentCheckoutMode.ON_AGENT) {
       getBuild().getBuildLogger().error("Wrong checkout mode. This build step works only with agent-side checkout");
       setUnsuccess();
       return;
     }
+
+    PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi);
+    fetcher.fetchPRs();
 
     try {
       preliminaryMerge();
@@ -88,6 +98,14 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   }
 
   protected void makeVcsRootPreliminaryMerge(VcsRoot root, String repoRelativePath) throws VcsException {
+    /*PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(new HttpCredentials() {
+      @Override
+      public void set(@NotNull jetbrains.buildServer.util.HTTPRequestBuilder requestBuilder) {
+        requestBuilder.withHeader("Authorization", "bearer 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");
+      }
+    }, null, httpApi);
+    fetcher.fetchPRs();*/
+
     PremergeBranchSupport branchSupport = createPremergeBranchSupport(root, repoRelativePath);
 
     String premergeBranch = branchSupport.constructBranchName();
