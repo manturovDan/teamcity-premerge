@@ -82,6 +82,11 @@ public class MockGitFacadeBuilder {
           public void addPostAction(@NotNull Runnable action) {
 
           }
+
+          @Override
+          public void throwExceptionOnNonZeroExitCode(boolean throwExceptionOnNonZeroExitCode) {
+
+          }
         };
       }
 
@@ -201,6 +206,11 @@ public class MockGitFacadeBuilder {
           public void addPostAction(@NotNull Runnable action) {
 
           }
+
+          @Override
+          public void throwExceptionOnNonZeroExitCode(boolean throwExceptionOnNonZeroExitCode) {
+
+          }
         };
       }
 
@@ -276,6 +286,11 @@ public class MockGitFacadeBuilder {
 
           @Override
           public void addPostAction(@NotNull Runnable action) {
+
+          }
+
+          @Override
+          public void throwExceptionOnNonZeroExitCode(boolean throwExceptionOnNonZeroExitCode) {
 
           }
         };
@@ -417,6 +432,11 @@ public class MockGitFacadeBuilder {
           public void addPostAction(@NotNull Runnable action) {
 
           }
+
+          @Override
+          public void throwExceptionOnNonZeroExitCode(boolean throwExceptionOnNonZeroExitCode) {
+
+          }
         };
       }
 
@@ -521,6 +541,11 @@ public class MockGitFacadeBuilder {
 
           @Override
           public void addPostAction(@NotNull Runnable action) {
+
+          }
+
+          @Override
+          public void throwExceptionOnNonZeroExitCode(boolean throwExceptionOnNonZeroExitCode) {
 
           }
         };

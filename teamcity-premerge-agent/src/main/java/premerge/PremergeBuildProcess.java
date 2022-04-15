@@ -16,9 +16,8 @@
 
 package premerge;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitUtils;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
@@ -28,6 +27,7 @@ import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
+import trains.PullRequestEntity;
 import trains.PullRequestsFetcher;
 import trains.impl.github.GitHubPullRequestsFetcher;
 
@@ -40,7 +40,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final BuildRunnerContext myRunner;
   @NotNull private final HttpApi myHttpApi;
 
-  private String targetBranch;
+  private final String targetBranch;
   private final Map<String, String> targetSHAs = new HashMap<>();
   private ResultStatus status = ResultStatus.SKIPPED;
   private int unsuccessfulFetchesCount = 0;
@@ -61,6 +61,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     myBuild = build;
     myRunner = runner;
     myHttpApi = httpApi;
+    targetBranch = PremergeBranchSupport.cutRefsHeads(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
   }
 
   @Override
@@ -72,10 +73,11 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       return;
     }
 
-    PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi);
-    fetcher.fetchPRs();
+    //PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi);
+    //fetcher.fetchPRs();
 
     try {
+      runTrain();
       preliminaryMerge();
     }
     catch (VcsException vcsException) {
@@ -84,7 +86,6 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   }
 
   protected void preliminaryMerge() throws VcsException {
-    targetBranch = PremergeBranchSupport.cutRefsHeads(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
     List<VcsRootEntry> vcsRootEntries = myBuild.getVcsRootEntries();
     for (VcsRootEntry entry : vcsRootEntries) {
       makeVcsRootPreliminaryMerge(entry.getVcsRoot(), entry.getCheckoutRules().map("."));
@@ -95,6 +96,36 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       setUnsuccess();
       throw new VcsException("Fetching all target branches error");
     }
+  }
+
+  protected void runTrain() throws VcsException {
+    List<VcsRootEntry> vcsRootEntries = myBuild.getVcsRootEntries();
+    if(vcsRootEntries.size() != 1) {
+      getBuild().getBuildLogger().error("Build type with singe VCS root are only supported");
+      setUnsuccess();
+      throw new VcsException("Build type with singe VCS root are only supported");
+    }
+
+    PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi); //TODO make provider
+    Map<String, PullRequestEntity> pullRequests = fetcher.fetchPRs();
+
+    VcsRoot root = vcsRootEntries.get(0).getVcsRoot();
+
+    String currentPRNumber = getBuild().getSharedConfigParameters().get(PremergeConstants.PULL_REQUEST_NUMBER_SHARED_PARAM);
+
+    List<String> excludeNumbers = Collections.singletonList(currentPRNumber);
+    //TODO exclude failed
+
+    Set<String> branchesToAttach = filterPRs(pullRequests, excludeNumbers, pullRequests.get(currentPRNumber).getUpdateTime());
+    System.out.println("END NOW");
+  }
+
+  protected Set<String> filterPRs(Map<String, PullRequestEntity> PRs, List<String> excludeNumbers, Date timeThreshold) {
+    return PRs.values().stream().filter(pr -> pr.getUpdateTime().before(timeThreshold))
+                                .filter(pr -> !excludeNumbers.contains(pr.getNumber()))
+                                .filter(pr -> PremergeBranchSupport.cutRefsHeads(targetBranch).equals(PremergeBranchSupport.cutRefsHeads(pr.getTargetBranch())))
+                                .map(pr -> pr.getSourceBranch())
+                                .collect(Collectors.toSet());
   }
 
   protected void makeVcsRootPreliminaryMerge(VcsRoot root, String repoRelativePath) throws VcsException {

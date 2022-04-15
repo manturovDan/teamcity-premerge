@@ -6,6 +6,7 @@ import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactory;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactory;
+import jetbrains.buildServer.http.HttpApi;
 import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import org.jetbrains.annotations.NotNull;
@@ -26,9 +27,10 @@ public class MockPremergeBuildProcess extends PremergeBuildProcess {
                                   @NotNull GitAgentSSHService sshService,
                                   @NotNull GitMetaFactory gitMetaFactory,
                                   @NotNull MirrorManager mirrorManager,
+                                  @NotNull HttpApi httpApi,
                                   @NotNull AgentRunningBuild build,
                                   @NotNull BuildRunnerContext runner) {
-    super(configFactory, sshService, gitMetaFactory, mirrorManager, build, runner);
+    super(configFactory, sshService, gitMetaFactory, mirrorManager, httpApi, build, runner);
   }
 
   public void setFetchSuccess(boolean fetchSuccess, int num) {

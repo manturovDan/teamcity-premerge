@@ -5,19 +5,17 @@ import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
-public class GitHubPullRequestDeserializer implements JsonDeserializer<List<GitHubPullRequestEntity>> {
+public class GitHubPullRequestDeserializer implements JsonDeserializer<Map<String, GitHubPullRequestEntity>> {
   @Override
-  public List<GitHubPullRequestEntity> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-    List<GitHubPullRequestEntity> PRs = new ArrayList<>();
+  public Map<String, GitHubPullRequestEntity> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    Map<String, GitHubPullRequestEntity> PRs = new HashMap<>();
     JsonArray jsonPRs = json.getAsJsonArray();
     for (JsonElement pr : jsonPRs) {
       JsonObject prObj = pr.getAsJsonObject();
-      PRs.add(new GitHubPullRequestEntity(prObj.get("number").getAsString(),
+      PRs.put(prObj.get("number").getAsString(),
+              new GitHubPullRequestEntity(prObj.get("number").getAsString(),
                                           convertDate(prObj.get("updated_at").getAsString()),
                                           prObj.get("head").getAsJsonObject().get("ref").getAsString(),
                                           prObj.get("base").getAsJsonObject().get("ref").getAsString()));

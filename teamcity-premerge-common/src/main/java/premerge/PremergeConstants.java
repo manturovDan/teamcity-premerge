@@ -29,4 +29,5 @@ public class PremergeConstants {
   public static final String PRELIMINARY_MERGE_BRANCH_PREFIX = "premerge";
   public static final String TARGET_BRANCH_SHARED_PARAM = "teamcity.build.premerge.target";
   public static final String TARGET_SHA_SHARED_PARAM = "teamcity.build.premerge.targetSHA";
+  public static final String PULL_REQUEST_NUMBER_SHARED_PARAM = "teamcity.pullRequest.branch.pullrequests";
 }

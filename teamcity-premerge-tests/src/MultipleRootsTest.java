@@ -6,6 +6,7 @@ import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactory;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactory;
+import jetbrains.buildServer.http.HttpApi;
 import jetbrains.buildServer.vcs.CheckoutRules;
 import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jmock.Mockery;
@@ -21,6 +22,7 @@ public class MultipleRootsTest {
   private GitAgentSSHService sshService;
   private PluginConfigFactory configFactory;
   private MirrorManager mirrorManager;
+  private HttpApi httpApi;
 
 
   @BeforeMethod
@@ -33,6 +35,7 @@ public class MultipleRootsTest {
     sshService = context.mock(GitAgentSSHService.class);
     configFactory = context.mock(PluginConfigFactory.class);
     mirrorManager = context.mock(MirrorManager.class);
+    httpApi = context.mock(HttpApi.class);
   }
 
   @Test
@@ -45,6 +48,7 @@ public class MultipleRootsTest {
                                                                     sshService,
                                                                     gitMetaFactory,
                                                                     mirrorManager,
+                                                                    httpApi,
                                                                     runningBuild,
                                                                     runnerContext);
 
@@ -81,6 +85,7 @@ public class MultipleRootsTest {
                                                                     sshService,
                                                                     gitMetaFactory,
                                                                     mirrorManager,
+                                                                    httpApi,
                                                                     runningBuild,
                                                                     runnerContext);
 
@@ -122,6 +127,7 @@ public class MultipleRootsTest {
                                                                     sshService,
                                                                     gitMetaFactory,
                                                                     mirrorManager,
+                                                                    httpApi,
                                                                     runningBuild,
                                                                     runnerContext);
 
@@ -160,6 +166,7 @@ public class MultipleRootsTest {
                                                                     sshService,
                                                                     gitMetaFactory,
                                                                     mirrorManager,
+                                                                    httpApi,
                                                                     runningBuild,
                                                                     runnerContext);
 

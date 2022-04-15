@@ -25,7 +25,7 @@ public class RESTHelper {
     try {
       IOGuard.allowNetworkCall(() -> {
         respPRsRef.set(
-          myHttpApi.get(myApiUrl + path, new HttpApi.HeaderPair("Authentification", "bearer " + myToken)));
+          myHttpApi.get(myApiUrl + path, new HttpApi.HeaderPair("Authorization", "Bearer " + myToken)));
       });
       return respPRsRef.get();
     } catch (IOException e) {
