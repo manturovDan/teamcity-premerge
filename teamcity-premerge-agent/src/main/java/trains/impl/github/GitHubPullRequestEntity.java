@@ -9,15 +9,18 @@ public class GitHubPullRequestEntity implements PullRequestEntity {
   @NotNull final private Date myUpdatedAt;
   @NotNull final private String mySourceBranch;
   @NotNull final private String myTargetBranch;
+  @NotNull final private boolean myIsValid;
 
   public GitHubPullRequestEntity(@NotNull String number,
                                  @NotNull Date updatedAt,
                                  @NotNull String sourceBranch,
-                                 @NotNull String targetBranch) {
+                                 @NotNull String targetBranch,
+                                 boolean isValid) {
     myNumber = number;
     myUpdatedAt = updatedAt;
     mySourceBranch = sourceBranch;
     myTargetBranch = targetBranch;
+    myIsValid = isValid;
   }
 
   @NotNull
@@ -42,5 +45,10 @@ public class GitHubPullRequestEntity implements PullRequestEntity {
   @Override
   public String getTargetBranch() {
     return myTargetBranch;
+  }
+
+  @Override
+  public boolean isValid() {
+    return myIsValid;
   }
 }

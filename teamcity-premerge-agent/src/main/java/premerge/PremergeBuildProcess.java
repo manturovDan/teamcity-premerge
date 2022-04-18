@@ -77,7 +77,6 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     //fetcher.fetchPRs();
 
     try {
-      runTrain();
       preliminaryMerge();
     }
     catch (VcsException vcsException) {
@@ -87,8 +86,9 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
 
   protected void preliminaryMerge() throws VcsException {
     List<VcsRootEntry> vcsRootEntries = myBuild.getVcsRootEntries();
+    Set<String> branchesToPremerge = makeTrain();
     for (VcsRootEntry entry : vcsRootEntries) {
-      makeVcsRootPreliminaryMerge(entry.getVcsRoot(), entry.getCheckoutRules().map("."));
+      makeVcsRootPreliminaryMerge(entry.getVcsRoot(), entry.getCheckoutRules().map("."), branchesToPremerge);
     }
 
     if (unsuccessfulFetchesCount == vcsRootEntries.size()) {
@@ -98,7 +98,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     }
   }
 
-  protected void runTrain() throws VcsException {
+  protected Set<String> makeTrain() throws VcsException {
     List<VcsRootEntry> vcsRootEntries = myBuild.getVcsRootEntries();
     if(vcsRootEntries.size() != 1) {
       getBuild().getBuildLogger().error("Build type with singe VCS root are only supported");
@@ -109,15 +109,16 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi); //TODO make provider
     Map<String, PullRequestEntity> pullRequests = fetcher.fetchPRs();
 
-    VcsRoot root = vcsRootEntries.get(0).getVcsRoot();
-
     String currentPRNumber = getBuild().getSharedConfigParameters().get(PremergeConstants.PULL_REQUEST_NUMBER_SHARED_PARAM);
+    if (!pullRequests.get(currentPRNumber).isValid()) {
+      throw new RuntimeException("Invalid PR"); //todo normal
+    }
 
-    List<String> excludeNumbers = Collections.singletonList(currentPRNumber);
-    //TODO exclude failed
+    List<String> excludeNumbers = new ArrayList<>(Collections.singletonList(currentPRNumber));
+    excludeNumbers.addAll(pullRequests.values().stream().filter(pr -> !pr.isValid()).map(pr -> pr.getNumber()).collect(Collectors.toList()));
 
     Set<String> branchesToAttach = filterPRs(pullRequests, excludeNumbers, pullRequests.get(currentPRNumber).getUpdateTime());
-    System.out.println("END NOW");
+    return branchesToAttach;
   }
 
   protected Set<String> filterPRs(Map<String, PullRequestEntity> PRs, List<String> excludeNumbers, Date timeThreshold) {
@@ -128,15 +129,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
                                 .collect(Collectors.toSet());
   }
 
-  protected void makeVcsRootPreliminaryMerge(VcsRoot root, String repoRelativePath) throws VcsException {
-    /*PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(new HttpCredentials() {
-      @Override
-      public void set(@NotNull jetbrains.buildServer.util.HTTPRequestBuilder requestBuilder) {
-        requestBuilder.withHeader("Authorization", "bearer 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");
-      }
-    }, null, httpApi);
-    fetcher.fetchPRs();*/
-
+  protected void makeVcsRootPreliminaryMerge(VcsRoot root, String repoRelativePath, Set<String> branchesToAttach) throws VcsException {
     PremergeBranchSupport branchSupport = createPremergeBranchSupport(root, repoRelativePath);
 
     String premergeBranch = branchSupport.constructBranchName();
@@ -149,8 +142,11 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     else {
       try {
         branchSupport.fetch(targetBranch);
+        for (String trainBranch : branchesToAttach) {
+          branchSupport.fetch(trainBranch);
+        }
       } catch (VcsException e) {
-        unsuccessfulFetchesCount++;
+        unsuccessfulFetchesCount++; // TODO NORMAL
         return;
       }
 
@@ -158,6 +154,9 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
         branchSupport.createBranch(premergeBranch);
         branchSupport.checkout(premergeBranch);
         branchSupport.merge(targetBranch);
+        for (String traingBranch : branchesToAttach) {
+          branchSupport.merge(traingBranch);
+        }
         targetSHAs.put(root.getExternalId(), branchSupport.getParameter(targetBranch));
       } catch (VcsException ex) {
         setUnsuccess();

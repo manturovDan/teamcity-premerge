@@ -8,4 +8,5 @@ public interface PullRequestEntity {
   @NotNull public Date getUpdateTime();
   @NotNull public String getSourceBranch();
   @NotNull public String getTargetBranch();
+  public boolean isValid();
 }

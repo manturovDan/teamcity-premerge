@@ -18,7 +18,8 @@ public class GitHubPullRequestDeserializer implements JsonDeserializer<Map<Strin
               new GitHubPullRequestEntity(prObj.get("number").getAsString(),
                                           convertDate(prObj.get("updated_at").getAsString()),
                                           prObj.get("head").getAsJsonObject().get("ref").getAsString(),
-                                          prObj.get("base").getAsJsonObject().get("ref").getAsString()));
+                                          prObj.get("base").getAsJsonObject().get("ref").getAsString(),
+                                          canMerge(prObj) && !hasInvalidLabel(prObj)));
     }
     return PRs;
   }
@@ -30,5 +31,18 @@ public class GitHubPullRequestDeserializer implements JsonDeserializer<Map<Strin
     } catch (ParseException e) {
       throw new RuntimeException("Date parsing error"); // TODO Normal
     }
+  }
+
+  private static boolean canMerge(JsonObject pr) {
+    return !pr.get("merge_commit_sha").isJsonNull();
+  }
+
+  private static boolean hasInvalidLabel(JsonObject pr) {
+    JsonArray labels = pr.get("labels").getAsJsonArray();
+    for (JsonElement label : labels) {
+      if ("invalid".equals(label.getAsJsonObject().get("name").getAsString()))
+        return true;
+    }
+    return false;
   }
 }
