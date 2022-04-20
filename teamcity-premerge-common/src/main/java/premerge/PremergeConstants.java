@@ -30,6 +30,7 @@ public class PremergeConstants {
   public static final String TARGET_BRANCH_SHARED_PARAM = "teamcity.build.premerge.target";
   public static final String TARGET_SHA_SHARED_PARAM = "teamcity.build.premerge.targetSHA";
   public static final String PULL_REQUEST_NUMBER_SHARED_PARAM = "teamcity.pullRequest.branch.pullrequests";
+  public static final String MERGE_TRAIN_PULL_REQUESTS = "teamcity.build.mergetrains.pullrequests";
 
   public static final String TYPE_FINISH = "trainFinish";
   public static final String DISPLAY_NAME_FINISH = "Merge train (finish)";

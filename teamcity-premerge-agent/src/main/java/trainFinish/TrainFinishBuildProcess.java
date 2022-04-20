@@ -1,7 +1,12 @@
 package trainFinish;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentRunningBuild;
+import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildProcessAdapter;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
@@ -11,6 +16,7 @@ import jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactory;
 import jetbrains.buildServer.http.HttpApi;
 import org.jetbrains.annotations.NotNull;
 import premerge.PremergeConstants;
+import trains.PullRequestEntity;
 import trains.PullRequestsFetcher;
 import trains.impl.github.GitHubPullRequestsFetcher;
 
@@ -22,6 +28,7 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
   @NotNull private final AgentRunningBuild myBuild;
   @NotNull private final BuildRunnerContext myRunner;
   @NotNull private final HttpApi myHttpApi;
+  private boolean success = false;
 
   public TrainFinishBuildProcess(@NotNull PluginConfigFactory configFactory,
                                  @NotNull GitAgentSSHService sshService,
@@ -43,15 +50,36 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
   public void start() throws RunBuildException {
     myBuild.getBuildLogger().message("Merge Train finish build step:");
     String currentPRNumber = myBuild.getSharedConfigParameters().get(PremergeConstants.PULL_REQUEST_NUMBER_SHARED_PARAM);
-    if (isBuildFailed()) {
-      PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi);
-      fetcher.setUnsuccess(currentPRNumber);
+    PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi);
+    if (isBuildFailed()) { //check if canceled (just rerurn)
+      fetcher.setUnsuccess(currentPRNumber); //and rerun builds later TODO maybe?
+      myBuild.getBuildLogger().message("INVALID");
+    }
+    else if (isTrainBroken(fetcher)) {
+      //else rerun build
+      myBuild.getBuildLogger().message("Should rerun build");
     }
     else {
-      //get all build PRs and check statuses
-      //if nothing is invalid PRINT MESSAGE OK
-      //else rerun build
+      success = true;
+      myBuild.getBuildLogger().message("OKAY");
     }
+  }
+
+  @NotNull
+  @Override
+  public BuildFinishedStatus waitFor() throws RunBuildException {
+    return success ? BuildFinishedStatus.FINISHED_SUCCESS : BuildFinishedStatus.FINISHED_FAILED;
+  }
+
+  private boolean isTrainBroken(PullRequestsFetcher fetcher) {
+    Map<String, PullRequestEntity> allPullRequests = fetcher.fetchPRs();
+    Set<String> involvedPRs = new HashSet<>(Arrays.asList(myBuild.getSharedConfigParameters().get(PremergeConstants.MERGE_TRAIN_PULL_REQUESTS).split(",")));
+
+    for (String involved : involvedPRs) {
+      if (!allPullRequests.get(involved).isValid())
+        return true;
+    }
+    return false;
   }
 
   private boolean isBuildFailed() {

@@ -117,15 +117,23 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     List<String> excludeNumbers = new ArrayList<>(Collections.singletonList(currentPRNumber));
     excludeNumbers.addAll(pullRequests.values().stream().filter(pr -> !pr.isValid()).map(pr -> pr.getNumber()).collect(Collectors.toList()));
 
-    Set<String> branchesToAttach = filterPRs(pullRequests, excludeNumbers, pullRequests.get(currentPRNumber).getUpdateTime());
+    Set<PullRequestEntity> PRsToAttach = filterPRs(pullRequests, excludeNumbers, pullRequests.get(currentPRNumber).getUpdateTime());
+
+    Set<String> branchesToAttach = PRsToAttach.stream()
+                                              .map(pr -> pr.getSourceBranch())
+                                              .collect(Collectors.toSet());
+
+    getBuild().addSharedConfigParameter(PremergeConstants.MERGE_TRAIN_PULL_REQUESTS, String.join(",",
+                                                                                                 PRsToAttach.stream()
+                                                                                                            .map(pr -> pr.getNumber())
+                                                                                                            .collect(Collectors.toSet())));
     return branchesToAttach;
   }
 
-  protected Set<String> filterPRs(Map<String, PullRequestEntity> PRs, List<String> excludeNumbers, Date timeThreshold) {
+  protected Set<PullRequestEntity> filterPRs(Map<String, PullRequestEntity> PRs, List<String> excludeNumbers, Date timeThreshold) {
     return PRs.values().stream().filter(pr -> pr.getUpdateTime().before(timeThreshold))
                                 .filter(pr -> !excludeNumbers.contains(pr.getNumber()))
                                 .filter(pr -> PremergeBranchSupport.cutRefsHeads(targetBranch).equals(PremergeBranchSupport.cutRefsHeads(pr.getTargetBranch())))
-                                .map(pr -> pr.getSourceBranch())
                                 .collect(Collectors.toSet());
   }
 
