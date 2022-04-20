@@ -23,4 +23,12 @@ public class GitHubPullRequestsFetcher implements PullRequestsFetcher {
     HttpApi.Response prResp = myHttpHelper.get("pulls");
     return myGson.fromJson(prResp.getBody(), Map.class);
   }
+
+  @Override
+  public void setUnsuccess(String prNumber) {
+    HttpApi.Response setLabelResp = myHttpHelper.post("issues/" + prNumber + "/labels", "{\"labels\":[\"invalid\"]}", new HttpApi.HeaderPair("Accept", "application/vnd.github.v3+json"));
+    if (setLabelResp.getStatusCode() / 100 != 2) {
+      throw new RuntimeException("set label error"); //TODO Normal
+    }
+  }
 }
