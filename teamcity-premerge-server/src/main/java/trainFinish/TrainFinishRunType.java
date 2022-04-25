@@ -1,10 +1,14 @@
 package trainFinish;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.RunTypeRegistry;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,13 +44,29 @@ public class TrainFinishRunType extends RunType {
   @Nullable
   @Override
   public PropertiesProcessor getRunnerPropertiesProcessor() {
-    return null;
+    return new PropertiesProcessor() {
+      @Override
+      public Collection<InvalidProperty> process(Map<String, String> properties) {
+        final HashSet<InvalidProperty> invalid = new HashSet<>();
+        String gitHubToken = properties.get(PremergeConstants.GITHUB_ACCESS_TOKEN);
+        if (StringUtil.isEmpty(gitHubToken)) {
+          invalid.add(new InvalidProperty(PremergeConstants.GITHUB_ACCESS_TOKEN, "GitHub Access Token must be specified"));
+        }
+
+        String teamcityToken = properties.get(PremergeConstants.TEAMCITY_ACCESS_TOKEN);
+        if (StringUtil.isEmpty(teamcityToken)) {
+          invalid.add(new InvalidProperty(PremergeConstants.TEAMCITY_ACCESS_TOKEN, "TeamCity Access Token must be specified"));
+        }
+
+        return invalid;
+      }
+    };
   }
 
   @Nullable
   @Override
   public String getEditRunnerParamsJspFilePath() {
-    return myPluginDescriptor.getPluginResourcesPath("viewPremergeParams.jsp");
+    return myPluginDescriptor.getPluginResourcesPath("trainFinishParams.jsp");
   }
 
   @Nullable

@@ -47,7 +47,7 @@ public class PremergeRunType extends RunType {
   @NotNull
   @Override
   public String getDisplayName() {
-    return PremergeConstants.DISPLAY_NAME;
+    return PremergeConstants.DISPLAY_NAME_START;
   }
 
   @NotNull
@@ -63,9 +63,9 @@ public class PremergeRunType extends RunType {
       @Override
       public Collection<InvalidProperty> process(Map<String, String> properties) {
         final HashSet<InvalidProperty> invalid = new HashSet<>();
-        String targetBranch = properties.get(PremergeConstants.TARGET_BRANCH);
-        if (StringUtil.isEmpty(targetBranch)) {
-          invalid.add(new InvalidProperty(PremergeConstants.TARGET_BRANCH, "Target branch must be specified"));
+        String gitHubToken = properties.get(PremergeConstants.GITHUB_ACCESS_TOKEN);
+        if (StringUtil.isEmpty(gitHubToken)) {
+          invalid.add(new InvalidProperty(PremergeConstants.GITHUB_ACCESS_TOKEN, "GitHub Access Token must be specified"));
         }
 
         return invalid;
@@ -95,7 +95,7 @@ public class PremergeRunType extends RunType {
   @Override
   public String describeParameters(@NotNull Map<String, String> parameters) {
     StringBuilder builder = new StringBuilder();
-    builder.append("Target branch: ").append(StringUtil.emptyIfNull(parameters.get(premerge.PremergeConstants.TARGET_BRANCH)));
+    builder.append("GitHub Access Token: ").append(parameters.get(PremergeConstants.GITHUB_ACCESS_TOKEN) == null ? "not specified" : "***");
     return builder.toString();
   }
 }

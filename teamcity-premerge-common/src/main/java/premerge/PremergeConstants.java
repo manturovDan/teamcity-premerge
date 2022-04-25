@@ -22,16 +22,18 @@ public class PremergeConstants {
   }
 
   public static final String TYPE = "premergeRunner";
-  public static final String DISPLAY_NAME = "Preliminary Merge";
-  public static final String DESCRIPTION = "Makes preliminary merge commits with " +
-                                           "\"Target branch\" when a source branch is updated (source branch must be set in 'Build condition')";
+  public static final String DISPLAY_NAME_START = "Merge train (start)";
+  public static final String DESCRIPTION = "Makes preliminary merge commits of " +
+                                           "pull request target branch with all opened pull requests source branches.";
   public static final String TARGET_BRANCH = "tar.br";
+  public static final String TEAMCITY_ACCESS_TOKEN = "secure:tc.token";
+  public static final String GITHUB_ACCESS_TOKEN = "secure:github.token";
   public static final String PRELIMINARY_MERGE_BRANCH_PREFIX = "premerge";
   public static final String TARGET_BRANCH_SHARED_PARAM = "teamcity.build.premerge.target";
   public static final String TARGET_SHA_SHARED_PARAM = "teamcity.build.premerge.targetSHA";
   public static final String PULL_REQUEST_NUMBER_SHARED_PARAM = "teamcity.pullRequest.branch.pullrequests";
   public static final String MERGE_TRAIN_PULL_REQUESTS = "teamcity.build.mergetrains.pullrequests";
-
+  public static final String TARGET_BRANCH_PR_FEATURE_PARAM = "teamcity.pullRequest.target.branch";
   public static final String TYPE_FINISH = "trainFinish";
   public static final String DISPLAY_NAME_FINISH = "Merge train (finish)";
 }

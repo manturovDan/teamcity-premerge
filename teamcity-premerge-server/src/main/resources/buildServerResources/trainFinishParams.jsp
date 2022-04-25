@@ -21,3 +21,12 @@
     <span class="error" id="error_<%= PremergeConstants.GITHUB_ACCESS_TOKEN %>"></span>
   </td>
 </tr>
+<tr>
+  <th>
+    <label for="<%= PremergeConstants.TEAMCITY_ACCESS_TOKEN %>>">TeamCity Access Token:<l:star/></label>
+  </th>
+  <td>
+    <props:passwordProperty name="<%= PremergeConstants.TEAMCITY_ACCESS_TOKEN %>" className="longField"></props:passwordProperty>
+    <span class="error" id="error_<%= PremergeConstants.TEAMCITY_ACCESS_TOKEN %>"></span>
+  </td>
+</tr>

@@ -61,7 +61,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     myBuild = build;
     myRunner = runner;
     myHttpApi = httpApi;
-    targetBranch = PremergeBranchSupport.cutRefsHeads(myRunner.getRunnerParameters().get(PremergeConstants.TARGET_BRANCH));
+    targetBranch = PremergeBranchSupport.cutRefsHeads(getBuild().getSharedConfigParameters().get(PremergeConstants.TARGET_BRANCH_PR_FEATURE_PARAM));
   }
 
   @Override
@@ -73,32 +73,15 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       return;
     }
 
-    //PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi);
-    //fetcher.fetchPRs();
-
     try {
-      preliminaryMerge();
+      trainStart();
     }
     catch (VcsException vcsException) {
       myBuild.getBuildLogger().error("Error while build step execution");
     }
   }
 
-  protected void preliminaryMerge() throws VcsException {
-    List<VcsRootEntry> vcsRootEntries = myBuild.getVcsRootEntries();
-    Set<String> branchesToPremerge = makeTrain();
-    for (VcsRootEntry entry : vcsRootEntries) {
-      makeVcsRootPreliminaryMerge(entry.getVcsRoot(), entry.getCheckoutRules().map("."), branchesToPremerge);
-    }
-
-    if (unsuccessfulFetchesCount == vcsRootEntries.size()) {
-      getBuild().getBuildLogger().error("Fetching all target branches error");
-      setUnsuccess();
-      throw new VcsException("Fetching all target branches error");
-    }
-  }
-
-  protected Set<String> makeTrain() throws VcsException {
+  protected void trainStart() throws VcsException {
     List<VcsRootEntry> vcsRootEntries = myBuild.getVcsRootEntries();
     if(vcsRootEntries.size() != 1) {
       getBuild().getBuildLogger().error("Build type with singe VCS root are only supported");
@@ -106,7 +89,15 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
       throw new VcsException("Build type with singe VCS root are only supported");
     }
 
-    PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi); //TODO make provider
+    VcsRootEntry entry = vcsRootEntries.get(0);
+    Set<String> branchesToPremerge = makeTrain(entry.getVcsRoot());
+    makeVcsRootMultiplePreliminaryMerge(entry.getVcsRoot(), entry.getCheckoutRules().map("."), branchesToPremerge);
+  }
+
+  protected Set<String> makeTrain(VcsRoot root) throws VcsException {
+    PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi,
+                                                                root.getProperties().get("url"),
+                                                                myRunner.getRunnerParameters().get(PremergeConstants.GITHUB_ACCESS_TOKEN)); //TODO make provider
     Map<String, PullRequestEntity> pullRequests = fetcher.fetchPRs();
 
     String currentPRNumber = getBuild().getSharedConfigParameters().get(PremergeConstants.PULL_REQUEST_NUMBER_SHARED_PARAM);
@@ -137,7 +128,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
                                 .collect(Collectors.toSet());
   }
 
-  protected void makeVcsRootPreliminaryMerge(VcsRoot root, String repoRelativePath, Set<String> branchesToAttach) throws VcsException {
+  protected void makeVcsRootMultiplePreliminaryMerge(VcsRoot root, String repoRelativePath, Set<String> branchesToAttach) throws VcsException {
     PremergeBranchSupport branchSupport = createPremergeBranchSupport(root, repoRelativePath);
 
     String premergeBranch = branchSupport.constructBranchName();

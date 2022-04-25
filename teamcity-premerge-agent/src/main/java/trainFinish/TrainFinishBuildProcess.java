@@ -1,21 +1,22 @@
 package trainFinish;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildProcessAdapter;
 import jetbrains.buildServer.agent.BuildRunnerContext;
+import jetbrains.buildServer.agent.impl.AgentRunningBuildImpl;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactory;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactory;
 import jetbrains.buildServer.http.HttpApi;
+import jetbrains.buildServer.vcs.VcsException;
+import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
 import premerge.PremergeConstants;
+import teamcityREST.BuildRerunner;
 import trains.PullRequestEntity;
 import trains.PullRequestsFetcher;
 import trains.impl.github.GitHubPullRequestsFetcher;
@@ -50,18 +51,22 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
   public void start() throws RunBuildException {
     myBuild.getBuildLogger().message("Merge Train finish build step:");
     String currentPRNumber = myBuild.getSharedConfigParameters().get(PremergeConstants.PULL_REQUEST_NUMBER_SHARED_PARAM);
-    PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi);
-    if (isBuildFailed()) { //check if canceled (just rerurn)
-      fetcher.setUnsuccess(currentPRNumber); //and rerun builds later TODO maybe?
+    PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi,
+                                                                myBuild.getVcsRootEntries().get(0).getVcsRoot().getProperties().get("url"),
+                                                                myRunner.getRunnerParameters().get(PremergeConstants.GITHUB_ACCESS_TOKEN));
+    if (isBuildFailed()) {
+      //set parameter and check - optimization - todo later
+      fetcher.setUnsuccess(currentPRNumber);
       myBuild.getBuildLogger().message("INVALID");
     }
     else if (isTrainBroken(fetcher)) {
-      //else rerun build
       myBuild.getBuildLogger().message("Should rerun build");
+      restartBuild();
     }
     else {
       success = true;
       myBuild.getBuildLogger().message("OKAY");
+      //restartBuild();
     }
   }
 
@@ -76,7 +81,8 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
     Set<String> involvedPRs = new HashSet<>(Arrays.asList(myBuild.getSharedConfigParameters().get(PremergeConstants.MERGE_TRAIN_PULL_REQUESTS).split(",")));
 
     for (String involved : involvedPRs) {
-      if (!allPullRequests.get(involved).isValid())
+      PullRequestEntity entity = allPullRequests.get(involved);
+      if (entity != null && !entity.isValid())
         return true;
     }
     return false;
@@ -88,5 +94,14 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
     } catch (InterruptedException e) {
       throw new RuntimeException("Fail"); //TODO noraml
     }
+  }
+
+  private void restartBuild() {
+    BuildRerunner rerunner = new BuildRerunner(myRunner.getRunnerParameters().get(PremergeConstants.TEAMCITY_ACCESS_TOKEN),
+                                               "http://localhost:8111/bs/",
+                                               myHttpApi);
+
+    rerunner.restartBuild(myBuild.getBuildTypeExternalId(), myBuild.getSharedConfigParameters().get("teamcity.build.branch"));
+
   }
 }
