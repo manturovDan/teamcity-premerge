@@ -30,6 +30,7 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
   @NotNull private final BuildRunnerContext myRunner;
   @NotNull private final HttpApi myHttpApi;
   private boolean success = false;
+  private String trainPRs;
 
   public TrainFinishBuildProcess(@NotNull PluginConfigFactory configFactory,
                                  @NotNull GitAgentSSHService sshService,
@@ -50,6 +51,13 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
   @Override
   public void start() throws RunBuildException {
     myBuild.getBuildLogger().message("Merge Train finish build step:");
+    trainPRs = myBuild.getSharedConfigParameters().get(PremergeConstants.MERGE_TRAIN_PULL_REQUESTS);
+    if (trainPRs == null) {
+      success = true;
+      myBuild.getBuildLogger().message("There is no teamcity.build.mergetrains.pullrequests param. Skipping.");
+      return;
+    }
+
     String currentPRNumber = myBuild.getSharedConfigParameters().get(PremergeConstants.PULL_REQUEST_NUMBER_SHARED_PARAM);
     PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi,
                                                                 myBuild.getVcsRootEntries().get(0).getVcsRoot().getProperties().get("url"),
@@ -78,7 +86,7 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
 
   private boolean isTrainBroken(PullRequestsFetcher fetcher) {
     Map<String, PullRequestEntity> allPullRequests = fetcher.fetchPRs();
-    Set<String> involvedPRs = new HashSet<>(Arrays.asList(myBuild.getSharedConfigParameters().get(PremergeConstants.MERGE_TRAIN_PULL_REQUESTS).split(",")));
+    Set<String> involvedPRs = new HashSet<>(Arrays.asList(trainPRs.split(",")));
 
     for (String involved : involvedPRs) {
       PullRequestEntity entity = allPullRequests.get(involved);
