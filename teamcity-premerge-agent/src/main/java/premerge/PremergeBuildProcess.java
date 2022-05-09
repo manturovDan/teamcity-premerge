@@ -61,7 +61,13 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     myBuild = build;
     myRunner = runner;
     myHttpApi = httpApi;
-    targetBranch = PremergeBranchSupport.cutRefsHeads(getBuild().getSharedConfigParameters().get(PremergeConstants.TARGET_BRANCH_PR_FEATURE_PARAM));
+    String targetBranchRaw = getBuild().getSharedConfigParameters().get(PremergeConstants.TARGET_BRANCH_PR_FEATURE_PARAM);
+    if (targetBranchRaw != null) {
+      targetBranch = PremergeBranchSupport.cutRefsHeads(targetBranchRaw);
+    }
+    else {
+      targetBranch = null;
+    }
   }
 
   @Override
@@ -70,6 +76,12 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     if (myBuild.getEffectiveCheckoutMode() != AgentCheckoutMode.ON_AGENT) {
       getBuild().getBuildLogger().error("Wrong checkout mode. This build step works only with agent-side checkout");
       setUnsuccess();
+      return;
+    }
+
+    if (targetBranch == null) {
+      getBuild().getBuildLogger().error("There isn't Pull Request in this build. Skipped.");
+      setSuccess();
       return;
     }
 
@@ -172,9 +184,10 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @Override
   public BuildFinishedStatus waitFor() {
     if (getStatus() == ResultStatus.SUCCESS) {
-      assert targetBranch != null;
-      myBuild.addSharedConfigParameter(PremergeConstants.TARGET_BRANCH_SHARED_PARAM, targetBranch);
-      targetSHAs.forEach((name, sha) -> myBuild.addSharedConfigParameter(PremergeConstants.TARGET_SHA_SHARED_PARAM + "." + name, sha));
+      if (targetBranch != null) {
+        myBuild.addSharedConfigParameter(PremergeConstants.TARGET_BRANCH_SHARED_PARAM, targetBranch);
+        targetSHAs.forEach((name, sha) -> myBuild.addSharedConfigParameter(PremergeConstants.TARGET_SHA_SHARED_PARAM + "." + name, sha));
+      }
       return BuildFinishedStatus.FINISHED_SUCCESS;
     }
     else {
