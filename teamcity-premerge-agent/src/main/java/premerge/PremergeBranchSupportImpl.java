@@ -26,7 +26,7 @@ import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import jetbrains.buildServer.agent.oauth.AgentTokenStorage;
+//import jetbrains.buildServer.agent.oauth.AgentTokenStorage;
 
 public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   @NotNull private final AgentGitFacade myFacade;
