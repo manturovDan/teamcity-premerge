@@ -50,7 +50,7 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   }
 
   protected AgentGitVcsRoot createGitVcsRoot(VcsRoot root) throws VcsException {
-    return new AgentGitVcsRoot(myProcess.getMirrorManager(), myProcess.getBuild().getCheckoutDirectory(), root, null);
+    return new AgentGitVcsRoot(myProcess.getMirrorManager(), myProcess.getBuild().getCheckoutDirectory(), root);
   }
 
   protected AgentGitFacade getFacade() {
