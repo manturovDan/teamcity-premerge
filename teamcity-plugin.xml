@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
   <info>
-    <name>Preliminary merge</name>
-    <display-name>Preliminary merge</display-name>
+    <name>Merge Trains</name>
+    <display-name>Merge Trains</display-name>
     <version>1.0</version>
-    <description>This plugin allows running builds on merge results before the merge was committed.</description>
+    <description>This plugin provides experimantal functionality of Merge Trains.</description>
     <email>danila.manturov@jetbrains.com</email>
     <vendor>
       <name>JetBrains</name>
