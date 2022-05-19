@@ -104,7 +104,7 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
 
   private void restartBuild() {
     BuildRerunner rerunner = new BuildRerunner(myRunner.getRunnerParameters().get(PremergeConstants.TEAMCITY_ACCESS_TOKEN),
-                                               "http://localhost:8333/",
+                                               "http://localhost:8111/",
                                                myHttpApi);
 
     rerunner.restartBuild(myBuild.getBuildTypeExternalId(), myBuild.getSharedConfigParameters().get("teamcity.build.branch"));
