@@ -59,7 +59,7 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
     PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi,
                                                                 myBuild.getVcsRootEntries().get(0).getVcsRoot().getProperties().get("url"),
                                                                 myRunner.getRunnerParameters().get(PremergeConstants.GITHUB_ACCESS_TOKEN));
-    restartBuild();
+    //restartBuild();
     if (isBuildFailed()) {
       //set parameter and check - optimization - todo later
       fetcher.setUnsuccess(currentPRNumber);
