@@ -26,7 +26,7 @@ public class BuildRerunner {
   }
 
   public void restartBuild(@NotNull String buildTypeId, @NotNull String branchName) {
-    HttpApi.Response restartResp = myHttpHelper.post("app/rest/buildQueue", getBody(buildTypeId, branchName), new HttpApi.HeaderPair("Accept", "*/*"));
+    HttpApi.Response restartResp = myHttpHelper.post("app/rest/buildQueue?moveToTop=true", getBody(buildTypeId, branchName), new HttpApi.HeaderPair("Accept", "*/*"));
     if (restartResp == null || restartResp.getStatusCode() / 100 != 2) {
       throw new RuntimeException("Restart build error." + (restartResp != null ?
                                                            "code: " + restartResp.getStatusCode() + ", body: " + restartResp.getBody() : ""));
