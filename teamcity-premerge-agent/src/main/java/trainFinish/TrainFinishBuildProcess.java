@@ -60,14 +60,14 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
                                                                 myBuild.getVcsRootEntries().get(0).getVcsRoot().getProperties().get("url"),
                                                                 myRunner.getRunnerParameters().get(PremergeConstants.GITHUB_ACCESS_TOKEN));
     //restartBuild();
-    if (isBuildFailed()) {
-      //set parameter and check - optimization - todo later
-      fetcher.setUnsuccess(currentPRNumber);
-      myBuild.getBuildLogger().message("INVALID");
-    }
-    else if (isTrainBroken(fetcher)) {
+    if (isTrainBroken(fetcher)) {
       myBuild.getBuildLogger().message("Should rerun build");
       restartBuild();
+    }
+    else if (isBuildFailed()) {
+      //set parameter and check - optimization - maybe todo later
+      fetcher.setUnsuccess(currentPRNumber);
+      myBuild.getBuildLogger().message("INVALID");
     }
     else {
       success = true;
