@@ -23,7 +23,7 @@ public class GitHubPullRequestsFetcher implements PullRequestsFetcher {
   }
 
   public Map<String, PullRequestEntity> fetchPRs() {
-    HttpApi.Response prResp = myHttpHelper.get("pulls");
+    HttpApi.Response prResp = myHttpHelper.get("pulls?per_page=100");
     return myGson.fromJson(prResp.getBody(), Map.class);
   }
 
