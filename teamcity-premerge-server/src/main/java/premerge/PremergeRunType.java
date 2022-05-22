@@ -63,9 +63,9 @@ public class PremergeRunType extends RunType {
       @Override
       public Collection<InvalidProperty> process(Map<String, String> properties) {
         final HashSet<InvalidProperty> invalid = new HashSet<>();
-        String gitHubToken = properties.get(PremergeConstants.GITHUB_ACCESS_TOKEN);
+        String gitHubToken = properties.get(PremergeConstants.ACCESS_TOKEN);
         if (StringUtil.isEmpty(gitHubToken)) {
-          invalid.add(new InvalidProperty(PremergeConstants.GITHUB_ACCESS_TOKEN, "GitHub Access Token must be specified"));
+          invalid.add(new InvalidProperty(PremergeConstants.ACCESS_TOKEN, "GitHub Access Token must be specified"));
         }
 
         return invalid;
@@ -95,7 +95,7 @@ public class PremergeRunType extends RunType {
   @Override
   public String describeParameters(@NotNull Map<String, String> parameters) {
     StringBuilder builder = new StringBuilder();
-    builder.append("GitHub Access Token: ").append(parameters.get(PremergeConstants.GITHUB_ACCESS_TOKEN) == null ? "not specified" : "***");
+    builder.append("GitHub Access Token: ").append(parameters.get(PremergeConstants.ACCESS_TOKEN) == null ? "not specified" : "***");
     return builder.toString();
   }
 }

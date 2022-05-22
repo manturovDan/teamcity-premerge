@@ -16,7 +16,7 @@ import premerge.PremergeConstants;
 import teamcityREST.BuildRerunner;
 import trains.PullRequestEntity;
 import trains.PullRequestsFetcher;
-import trains.impl.github.GitHubPullRequestsFetcher;
+import trains.PullRequestsFetcherProvider;
 
 public class TrainFinishBuildProcess extends BuildProcessAdapter {
   @NotNull private final PluginConfigFactory myConfigFactory;
@@ -28,6 +28,7 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
   @NotNull private final HttpApi myHttpApi;
   private boolean success = false;
   private String trainPRs;
+  @NotNull private final PullRequestsFetcherProvider myPullRequestsFetcherProvider;
 
   public TrainFinishBuildProcess(@NotNull PluginConfigFactory configFactory,
                                  @NotNull GitAgentSSHService sshService,
@@ -35,7 +36,8 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
                                  @NotNull MirrorManager mirrorManager,
                                  @NotNull AgentRunningBuild build,
                                  @NotNull BuildRunnerContext runner,
-                                 @NotNull HttpApi httpApi) {
+                                 @NotNull HttpApi httpApi,
+                                 @NotNull PullRequestsFetcherProvider provider) {
     myConfigFactory = configFactory;
     mySshService = sshService;
     myGitMetaFactory = gitMetaFactory;
@@ -43,6 +45,7 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
     myBuild = build;
     myRunner = runner;
     myHttpApi = httpApi;
+    myPullRequestsFetcherProvider = provider;
   }
 
   @Override
@@ -56,9 +59,9 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
     }
 
     String currentPRNumber = myBuild.getSharedConfigParameters().get(PremergeConstants.PULL_REQUEST_NUMBER_SHARED_PARAM);
-    PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi,
+    PullRequestsFetcher fetcher = myPullRequestsFetcherProvider.getFetcher(myHttpApi,
                                                                 myBuild.getVcsRootEntries().get(0).getVcsRoot().getProperties().get("url"),
-                                                                myRunner.getRunnerParameters().get(PremergeConstants.GITHUB_ACCESS_TOKEN));
+                                                                myRunner.getRunnerParameters().get(PremergeConstants.ACCESS_TOKEN));
     //restartBuild();
     if (isTrainBroken(fetcher)) {
       myBuild.getBuildLogger().message("Should rerun build");

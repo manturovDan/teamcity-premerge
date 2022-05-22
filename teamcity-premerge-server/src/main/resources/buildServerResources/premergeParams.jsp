@@ -35,10 +35,10 @@
 </tr>
 <tr class="github_options">
   <th>
-    <label for="<%= PremergeConstants.GITHUB_ACCESS_TOKEN %>>">GitHub Access Token:<l:star/></label>
+    <label for="<%= PremergeConstants.ACCESS_TOKEN %>>">GitHub Access Token:<l:star/></label>
   </th>
   <td>
-    <props:passwordProperty name="<%= PremergeConstants.GITHUB_ACCESS_TOKEN %>" className="longField"></props:passwordProperty>
-    <span class="error" id="error_<%= PremergeConstants.GITHUB_ACCESS_TOKEN %>"></span>
+    <props:passwordProperty name="<%= PremergeConstants.ACCESS_TOKEN %>" className="longField"></props:passwordProperty>
+    <span class="error" id="error_<%= PremergeConstants.ACCESS_TOKEN %>"></span>
   </td>
 </tr>

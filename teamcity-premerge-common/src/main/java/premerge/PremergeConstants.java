@@ -27,7 +27,7 @@ public class PremergeConstants {
                                            "pull request target branch with all opened pull requests source branches.";
   public static final String TARGET_BRANCH = "tar.br";
   public static final String TEAMCITY_ACCESS_TOKEN = "secure:tc.token";
-  public static final String GITHUB_ACCESS_TOKEN = "secure:github.token";
+  public static final String ACCESS_TOKEN = "secure:github.token";
   public static final String PRELIMINARY_MERGE_BRANCH_PREFIX = "premerge";
   public static final String TARGET_BRANCH_SHARED_PARAM = "teamcity.build.premerge.target";
   public static final String TARGET_SHA_SHARED_PARAM = "teamcity.build.premerge.targetSHA";

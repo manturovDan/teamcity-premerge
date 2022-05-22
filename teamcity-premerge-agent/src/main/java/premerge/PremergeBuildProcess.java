@@ -30,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import trains.PullRequestEntity;
 import trains.PullRequestsFetcherProvider;
 import trains.PullRequestsFetcher;
-import trains.impl.github.GitHubPullRequestsFetcher;
 
 public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final PluginConfigFactory myConfigFactory;
@@ -112,7 +111,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   protected Set<String> makeTrain(VcsRoot root) throws VcsException {
     PullRequestsFetcher fetcher = myPullRequestsFetcherProvider.getFetcher(myHttpApi,
                                                                            root.getProperties().get("url"),
-                                                                           myRunner.getRunnerParameters().get(PremergeConstants.GITHUB_ACCESS_TOKEN));
+                                                                           myRunner.getRunnerParameters().get(PremergeConstants.ACCESS_TOKEN));
 
     Map<String, PullRequestEntity> pullRequests = fetcher.fetchPRs();
 

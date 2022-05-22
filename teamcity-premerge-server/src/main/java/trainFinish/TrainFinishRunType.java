@@ -48,9 +48,9 @@ public class TrainFinishRunType extends RunType {
       @Override
       public Collection<InvalidProperty> process(Map<String, String> properties) {
         final HashSet<InvalidProperty> invalid = new HashSet<>();
-        String gitHubToken = properties.get(PremergeConstants.GITHUB_ACCESS_TOKEN);
+        String gitHubToken = properties.get(PremergeConstants.ACCESS_TOKEN);
         if (StringUtil.isEmpty(gitHubToken)) {
-          invalid.add(new InvalidProperty(PremergeConstants.GITHUB_ACCESS_TOKEN, "GitHub Access Token must be specified"));
+          invalid.add(new InvalidProperty(PremergeConstants.ACCESS_TOKEN, "GitHub Access Token must be specified"));
         }
 
         String teamcityToken = properties.get(PremergeConstants.TEAMCITY_ACCESS_TOKEN);
