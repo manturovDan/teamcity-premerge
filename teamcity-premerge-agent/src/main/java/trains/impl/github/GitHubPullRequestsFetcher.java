@@ -16,7 +16,6 @@ public class GitHubPullRequestsFetcher implements PullRequestsFetcher {
   private final Gson myGson;
 
   public GitHubPullRequestsFetcher(HttpApi httpApi, String repoUrl, String accesToken) {
-    //myHttpHelper = new RESTHelper(httpApi, "https://api.github.com/repos/manturovDan/delay2", "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");
     myHttpHelper = new RESTHelper(httpApi, getApiURL(repoUrl), accesToken);
     GsonBuilder builder = new GsonBuilder().registerTypeAdapter(Map.class, new GitHubPullRequestDeserializer());
     myGson = builder.create();

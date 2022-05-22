@@ -16,7 +16,7 @@
 
 package premerge;
 
-import java.io.IOException;
+import java.util.HashSet;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService;
@@ -24,6 +24,7 @@ import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactory;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactory;
 import jetbrains.buildServer.http.HttpApi;
 import org.jetbrains.annotations.NotNull;
+import trains.PullRequestsFetcherProvider;
 
 public class PremergeBuildRunner implements AgentBuildRunner, AgentBuildRunnerInfo {
   @NotNull private final GitMetaFactory myGitMetaFactory;
@@ -31,6 +32,7 @@ public class PremergeBuildRunner implements AgentBuildRunner, AgentBuildRunnerIn
   @NotNull private final PluginConfigFactory myConfigFactory;
   @NotNull private final MirrorManager myMirrorManager;
   @NotNull private final HttpApi myHttpApi;
+  HashSet<PullRequestsFetcherProvider> myPullRequestFetcherProviders = new HashSet<>();
 
   public PremergeBuildRunner(@NotNull GitMetaFactory gitMetaFactory,
                              @NotNull GitAgentSSHService sshService,
@@ -44,10 +46,27 @@ public class PremergeBuildRunner implements AgentBuildRunner, AgentBuildRunnerIn
     myHttpApi = httpApi;
   }
 
+  public void registerPullRequestFetcherProvider(PullRequestsFetcherProvider pullRequestFetcherProvider) {
+    myPullRequestFetcherProviders.add(pullRequestFetcherProvider);
+  }
+
   @NotNull
   @Override
   public BuildProcess createBuildProcess(@NotNull AgentRunningBuild runningBuild, @NotNull BuildRunnerContext context) {
-   return new PremergeBuildProcess(myConfigFactory, mySshService, myGitMetaFactory, myMirrorManager, myHttpApi, runningBuild, context);
+    String currentRunnerType = context.getRunnerParameters().get("providerType");
+    for (PullRequestsFetcherProvider provider : myPullRequestFetcherProviders) {
+      if (provider.getType().equals(currentRunnerType)) {
+        return new PremergeBuildProcess(myConfigFactory,
+                                        mySshService,
+                                        myGitMetaFactory,
+                                        myMirrorManager,
+                                        myHttpApi,
+                                        runningBuild,
+                                        context,
+                                        provider);
+      }
+    }
+    throw new RuntimeException(currentRunnerType + " is unsupported");
   }
 
   @NotNull

@@ -36,4 +36,7 @@ public class PremergeConstants {
   public static final String TARGET_BRANCH_PR_FEATURE_PARAM = "teamcity.pullRequest.target.branch";
   public static final String TYPE_FINISH = "trainFinish";
   public static final String DISPLAY_NAME_FINISH = "Merge train (finish)";
+  public static final String BBCLOUD_USERNAME = "bbcloud_name";
+  public static final String BBCLOUD_PASSWORD = "bbcloud_password";
+  public static final String AZURE_TOKEN = "azure_token";
 }

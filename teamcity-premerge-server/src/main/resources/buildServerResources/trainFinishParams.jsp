@@ -28,11 +28,6 @@
     <props:selectProperty name="providerType" className="longfield">
       <props:option value="">&lt;Select Git-hosting type&gt;</props:option>
       <props:option value="github"><c:out value="GitHub"/></props:option>
-      <props:option value="gitlab"><c:out value="GitLab"/></props:option>
-      <props:option value="space"><c:out value="JetBrains Space"/></props:option>
-      <props:option value="bbserver"><c:out value="Bitbucket Server"/></props:option>
-      <props:option value="bbcloud"><c:out value="Bitbucket Cloud"/></props:option>
-      <props:option value="azure"><c:out value="Azure DevOps"/></props:option>
     </props:selectProperty>
     <span class="error" id="error_providerType"></span>
   </td>
@@ -46,7 +41,7 @@
     <span class="error" id="error_<%= PremergeConstants.GITHUB_ACCESS_TOKEN %>"></span>
   </td>
 </tr>
-<l:settingsGroup title="TeamCity Server acces" />
+<l:settingsGroup title="TeamCity Server access" />
 <tr>
   <th>
     <label for="<%= PremergeConstants.TEAMCITY_ACCESS_TOKEN %>>">TeamCity Access Token:<l:star/></label>

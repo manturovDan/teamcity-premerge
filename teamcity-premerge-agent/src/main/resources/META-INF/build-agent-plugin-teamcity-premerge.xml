@@ -10,4 +10,5 @@
   <bean id="gitAgentSshService" class="jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService" />
   <bean id="configFactory" class="jetbrains.buildServer.buildTriggers.vcs.git.agent.PluginConfigFactoryImpl"/>
   <bean id="mirrorManager" class="jetbrains.buildServer.buildTriggers.vcs.git.MirrorManagerImpl"></bean>
+  <bean id="gitHubPullRequestsFetcherProvider" class="trains.impl.github.GitHubPullRequestsFetcherProvider"></bean>
 </beans>

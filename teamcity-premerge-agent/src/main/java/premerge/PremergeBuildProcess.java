@@ -28,6 +28,7 @@ import jetbrains.buildServer.vcs.VcsRoot;
 import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
 import trains.PullRequestEntity;
+import trains.PullRequestsFetcherProvider;
 import trains.PullRequestsFetcher;
 import trains.impl.github.GitHubPullRequestsFetcher;
 
@@ -39,11 +40,11 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final AgentRunningBuild myBuild;
   @NotNull private final BuildRunnerContext myRunner;
   @NotNull private final HttpApi myHttpApi;
+  @NotNull private final PullRequestsFetcherProvider myPullRequestsFetcherProvider;
 
   private final String targetBranch;
   private final Map<String, String> targetSHAs = new HashMap<>();
   private ResultStatus status = ResultStatus.SKIPPED;
-  private int unsuccessfulFetchesCount = 0;
 
   public enum ResultStatus {SUCCESS, SKIPPED, FAILED}
 
@@ -53,7 +54,8 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
                               @NotNull MirrorManager mirrorManager,
                               @NotNull HttpApi httpApi,
                               @NotNull AgentRunningBuild build,
-                              @NotNull BuildRunnerContext runner) {
+                              @NotNull BuildRunnerContext runner,
+                              @NotNull PullRequestsFetcherProvider provider) {
     myConfigFactory = configFactory;
     mySshService = sshService;
     myGitMetaFactory = gitMetaFactory;
@@ -61,6 +63,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
     myBuild = build;
     myRunner = runner;
     myHttpApi = httpApi;
+    myPullRequestsFetcherProvider = provider;
     String targetBranchRaw = getBuild().getSharedConfigParameters().get(PremergeConstants.TARGET_BRANCH_PR_FEATURE_PARAM);
     if (targetBranchRaw != null) {
       targetBranch = PremergeBranchSupport.cutRefsHeads(targetBranchRaw);
@@ -107,9 +110,10 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   }
 
   protected Set<String> makeTrain(VcsRoot root) throws VcsException {
-    PullRequestsFetcher fetcher = new GitHubPullRequestsFetcher(myHttpApi,
-                                                                root.getProperties().get("url"),
-                                                                myRunner.getRunnerParameters().get(PremergeConstants.GITHUB_ACCESS_TOKEN)); //TODO make provider
+    PullRequestsFetcher fetcher = myPullRequestsFetcherProvider.getFetcher(myHttpApi,
+                                                                           root.getProperties().get("url"),
+                                                                           myRunner.getRunnerParameters().get(PremergeConstants.GITHUB_ACCESS_TOKEN));
+
     Map<String, PullRequestEntity> pullRequests = fetcher.fetchPRs();
 
     String currentPRNumber = getBuild().getSharedConfigParameters().get(PremergeConstants.PULL_REQUEST_NUMBER_SHARED_PARAM);
@@ -157,7 +161,6 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
           branchSupport.fetch(trainBranch);
         }
       } catch (VcsException e) {
-        unsuccessfulFetchesCount++; // TODO NORMAL
         return;
       }
 
