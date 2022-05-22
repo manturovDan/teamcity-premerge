@@ -1,5 +1,6 @@
 import java.util.List;
 import jetbrains.buildServer.agent.AgentRunningBuild;
+import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitUtils;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
@@ -44,7 +45,7 @@ public class PremergeCommadsTest {
   }
 
   @Test
-  public void processTest() {
+  public void noPRTest() {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setBuildId(780).build();
     runningBuild.addSharedConfigParameter(GitUtils.getGitRootBranchParamName(
       new VcsRootEntry(new MockVcsRoot().setUrl("git@...0"), new CheckoutRules(".")).getVcsRoot()), "refs/heads/feature_X");
@@ -61,8 +62,9 @@ public class PremergeCommadsTest {
 
     Assert.assertEquals(process.getTestStatus(), "NOT_STARTED");
     process.start();
-    process.waitFor();
-    Assert.assertEquals(process.getTestStatus(), "fetched_main,branch_premerge_branch_created,checkouted_to_premerge_branch,merged_main,asked_parameter_main");
+    BuildFinishedStatus status = process.waitFor();
+    Assert.assertEquals(process.getTestStatus(), "NOT_STARTED");
+    Assert.assertEquals(status.toString(), "FINISHED_SUCCESS");
   }
 
   @Test
@@ -77,6 +79,7 @@ public class PremergeCommadsTest {
     AgentRunningBuild runningBuild = new MockRunnerBuildBuilder().setBuildId(780).build();
     runningBuild.addSharedConfigParameter(GitUtils.getGitRootBranchParamName(
       new VcsRootEntry(new MockVcsRoot().setUrl("git@...0"), new CheckoutRules(".")).getVcsRoot()), "refs/heads/feature_X");
+    runningBuild.addSharedConfigParameter("teamcity.pullRequest.target.branch", "refs/heads/main");
     BuildRunnerContext runnerContext = new MockBuildRunnerCtx();
 
     Assert.assertEquals(runningBuild.getBuildId(), 780);

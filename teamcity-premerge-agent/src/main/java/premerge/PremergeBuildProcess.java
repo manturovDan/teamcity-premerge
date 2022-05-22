@@ -114,7 +114,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
 
     String currentPRNumber = getBuild().getSharedConfigParameters().get(PremergeConstants.PULL_REQUEST_NUMBER_SHARED_PARAM);
     if (!pullRequests.get(currentPRNumber).isValid()) {
-      throw new RuntimeException("Invalid PR"); //todo normal
+      throw new RuntimeException("Invalid Pull request"); //todo normal
     }
 
     List<String> excludeNumbers = new ArrayList<>(Collections.singletonList(currentPRNumber));
