@@ -101,13 +101,13 @@ public class TrainFinishBuildProcess extends BuildProcessAdapter {
     try {
       return myBuild.isBuildFailingOnServer();
     } catch (InterruptedException e) {
-      throw new RuntimeException("Fail"); //TODO noraml
+      throw new RuntimeException("Fail");
     }
   }
 
   private void restartBuild() {
     BuildRerunner rerunner = new BuildRerunner(myRunner.getRunnerParameters().get(PremergeConstants.TEAMCITY_ACCESS_TOKEN),
-                                               "http://192.168.0.102:8333/",
+                                               myRunner.getRunnerParameters().get("SERVER_URL"),
                                                myHttpApi);
 
     rerunner.restartBuild(myBuild.getBuildTypeExternalId(), myBuild.getSharedConfigParameters().get("teamcity.build.branch"));

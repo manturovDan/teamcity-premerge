@@ -47,7 +47,7 @@ public class RESTHelper {
       });
       return respPost.get();
     } catch (IOException e) {
-      System.out.println("get API request error"); //TODO normal
+      System.out.println("post API request error"); //TODO normal
       return null;
     }
   }

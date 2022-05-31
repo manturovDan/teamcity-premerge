@@ -30,7 +30,7 @@ public class GitHubPullRequestsFetcher implements PullRequestsFetcher {
   public void setUnsuccess(String prNumber) {
     HttpApi.Response setLabelResp = myHttpHelper.post("issues/" + prNumber + "/labels", "{\"labels\":[\"invalid\"]}", new HttpApi.HeaderPair("Accept", "application/vnd.github.v3+json"));
     if (setLabelResp.getStatusCode() / 100 != 2) {
-      throw new RuntimeException("set label error"); //TODO Normal
+      throw new RuntimeException("set label error");
     }
   }
 
@@ -40,7 +40,7 @@ public class GitHubPullRequestsFetcher implements PullRequestsFetcher {
       URL repoUrl = new URL(repo);
       return repoUrl.getProtocol() + "://api." + repoUrl.getHost() + "/repos" + repoUrl.getPath();
     } catch (MalformedURLException e) {
-      throw new RuntimeException("repo url error"); //TODO NORMAL
+      throw new RuntimeException("repo url error");
     }
   }
 }
