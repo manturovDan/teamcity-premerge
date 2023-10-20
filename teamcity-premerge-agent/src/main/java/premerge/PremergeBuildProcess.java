@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jetbrains.buildServer.agent.*;
+import jetbrains.buildServer.agent.oauth.AgentTokenStorage;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitUtils;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.*;
@@ -27,6 +28,7 @@ import jetbrains.buildServer.vcs.VcsException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final PluginConfigFactory myConfigFactory;
@@ -35,6 +37,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final MirrorManager myMirrorManager;
   @NotNull private final AgentRunningBuild myBuild;
   @NotNull private final BuildRunnerContext myRunner;
+  @Nullable private final AgentTokenStorage myTokenStorage;
   private String targetBranch;
   private final Map<String, String> targetSHAs = new HashMap<>();
   private ResultStatus status = ResultStatus.SKIPPED;
@@ -47,13 +50,15 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
                               @NotNull GitMetaFactory gitMetaFactory,
                               @NotNull MirrorManager mirrorManager,
                               @NotNull AgentRunningBuild build,
-                              @NotNull BuildRunnerContext runner) {
+                              @NotNull BuildRunnerContext runner,
+                              @NotNull AgentTokenStorage tokenStorage) {
     myConfigFactory = configFactory;
     mySshService = sshService;
     myGitMetaFactory = gitMetaFactory;
     myMirrorManager = mirrorManager;
     myBuild = build;
     myRunner = runner;
+    myTokenStorage = tokenStorage;
   }
 
   @Override
@@ -118,7 +123,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   }
 
   protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root, String repoRelativePath) throws VcsException {
-    return new PremergeBranchSupportImpl(this, root, repoRelativePath);
+    return new PremergeBranchSupportImpl(this, root, repoRelativePath, myTokenStorage);
   }
 
   @NotNull

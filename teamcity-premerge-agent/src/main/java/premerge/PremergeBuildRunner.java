@@ -17,6 +17,7 @@
 package premerge;
 
 import jetbrains.buildServer.agent.*;
+import jetbrains.buildServer.agent.oauth.AgentTokenStorage;
 import jetbrains.buildServer.buildTriggers.vcs.git.MirrorManager;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitAgentSSHService;
 import jetbrains.buildServer.buildTriggers.vcs.git.agent.GitMetaFactory;
@@ -28,21 +29,23 @@ public class PremergeBuildRunner implements AgentBuildRunner, AgentBuildRunnerIn
   @NotNull private final GitAgentSSHService mySshService;
   @NotNull private final PluginConfigFactory myConfigFactory;
   @NotNull private final MirrorManager myMirrorManager;
+  @NotNull private final AgentTokenStorage myTokenStorage;
 
   public PremergeBuildRunner(@NotNull GitMetaFactory gitMetaFactory,
                              @NotNull GitAgentSSHService sshService,
                              @NotNull PluginConfigFactory configFactory,
-                             @NotNull MirrorManager mirrorManager) {
+                             @NotNull MirrorManager mirrorManager, @NotNull AgentTokenStorage tokenStorage) {
     myGitMetaFactory = gitMetaFactory;
     mySshService = sshService;
     myConfigFactory = configFactory;
     myMirrorManager = mirrorManager;
+    myTokenStorage = tokenStorage;
   }
 
   @NotNull
   @Override
   public BuildProcess createBuildProcess(@NotNull AgentRunningBuild runningBuild, @NotNull BuildRunnerContext context) {
-    return new PremergeBuildProcess(myConfigFactory, mySshService, myGitMetaFactory, myMirrorManager, runningBuild, context);
+    return new PremergeBuildProcess(myConfigFactory, mySshService, myGitMetaFactory, myMirrorManager, runningBuild, context, myTokenStorage);
   }
 
   @NotNull

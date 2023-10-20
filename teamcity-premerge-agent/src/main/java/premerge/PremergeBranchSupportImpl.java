@@ -34,15 +34,18 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   @NotNull private final AgentPluginConfig myConfig;
   @NotNull protected final PremergeBuildProcess myProcess;
   @NotNull private final AgentGitVcsRoot myVcsRoot;
+  @Nullable private final AgentTokenStorage myTokenStorage;
 
   public PremergeBranchSupportImpl(@NotNull PremergeBuildProcess process,
                                    @NotNull VcsRoot root,
-                                   @NotNull String repoRelativePath) throws VcsException {
+                                   @NotNull String repoRelativePath,
+                                   @Nullable AgentTokenStorage tokenStorage) throws VcsException {
     myRoot = root;
     myProcess = process;
     myConfig = createPluginConfig();
     myVcsRoot = createGitVcsRoot(root);
     myFacade = getFacade(repoRelativePath);
+    myTokenStorage = tokenStorage;
   }
 
   protected AgentPluginConfig createPluginConfig() throws VcsException {
@@ -50,7 +53,7 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   }
 
   protected AgentGitVcsRoot createGitVcsRoot(VcsRoot root) throws VcsException {
-    return new AgentGitVcsRoot(myProcess.getMirrorManager(), myProcess.getBuild().getCheckoutDirectory(), root, null);
+    return new AgentGitVcsRoot(myProcess.getMirrorManager(), myProcess.getBuild().getCheckoutDirectory(), root, myTokenStorage);
   }
 
   protected AgentGitFacade getFacade() {
