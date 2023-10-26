@@ -40,13 +40,13 @@
     <dependency>
       <groupId>org.jetbrains.teamcity.internal</groupId>
       <artifactId>git-agent</artifactId>
-      <version>${teamcity-version}</version>
+      <version>2023.05.5-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>org.jetbrains.teamcity.internal</groupId>
       <artifactId>git-common</artifactId>
-      <version>${teamcity-version}</version>
+      <version>2023.05.5-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
