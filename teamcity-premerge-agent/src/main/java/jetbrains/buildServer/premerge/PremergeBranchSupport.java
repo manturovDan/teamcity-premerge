@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package premerge;
+package jetbrains.buildServer.premerge;
 
 import jetbrains.buildServer.vcs.VcsException;
 import org.jetbrains.annotations.NotNull;

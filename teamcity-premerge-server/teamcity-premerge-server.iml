@@ -8,11 +8,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="common-vcs" />
     <orderEntry type="library" name="annotations.jar" level="project" />
     <orderEntry type="module" module-name="teamcity-premerge-common" />
-    <orderEntry type="module" module-name="agent-openapi" />
-    <orderEntry type="module" module-name="git-agent-internal" />
-    <orderEntry type="module" module-name="oauth-integration-agent" />
+    <orderEntry type="module" module-name="server-common-api" />
+    <orderEntry type="module" module-name="server-openapi" />
   </component>
 </module>

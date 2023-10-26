@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package premerge;
+package jetbrains.buildServer.premerge;
 
 import java.io.File;
 import jetbrains.buildServer.agent.oauth.AgentTokenStorage;
@@ -40,12 +40,12 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
                                    @NotNull VcsRoot root,
                                    @NotNull String repoRelativePath,
                                    @Nullable AgentTokenStorage tokenStorage) throws VcsException {
+    myTokenStorage = tokenStorage;
     myRoot = root;
     myProcess = process;
     myConfig = createPluginConfig();
     myVcsRoot = createGitVcsRoot(root);
     myFacade = getFacade(repoRelativePath);
-    myTokenStorage = tokenStorage;
   }
 
   protected AgentPluginConfig createPluginConfig() throws VcsException {

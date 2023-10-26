@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package premerge;
+package jetbrains.buildServer.premerge;
 
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.agent.oauth.AgentTokenStorage;
@@ -57,7 +57,7 @@ public class PremergeBuildRunner implements AgentBuildRunner, AgentBuildRunnerIn
   @NotNull
   @Override
   public String getType() {
-    return premerge.PremergeConstants.TYPE;
+    return PremergeConstants.TYPE;
   }
 
   @Override

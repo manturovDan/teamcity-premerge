@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package premerge;
+package jetbrains.buildServer.premerge;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -95,7 +95,7 @@ public class PremergeRunType extends RunType {
   @Override
   public String describeParameters(@NotNull Map<String, String> parameters) {
     StringBuilder builder = new StringBuilder();
-    builder.append("Target branch: ").append(StringUtil.emptyIfNull(parameters.get(premerge.PremergeConstants.TARGET_BRANCH)));
+    builder.append("Target branch: ").append(StringUtil.emptyIfNull(parameters.get(PremergeConstants.TARGET_BRANCH)));
     return builder.toString();
   }
 }

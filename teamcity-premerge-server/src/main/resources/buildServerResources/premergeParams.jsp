@@ -1,4 +1,4 @@
-<%@ page import="premerge.PremergeConstants" %>
+<%@ page import="jetbrains.buildServer.premerge.PremergeConstants" %>
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 <%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms" %>

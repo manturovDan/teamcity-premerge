@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package premerge;
+package jetbrains.buildServer.premerge;
 
 public class PremergeConstants {
   private PremergeConstants() {
