@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<dsl-extension kind="buildStep" type="preliminaryMerge" generateDslJar="true">
+<dsl-extension kind="buildStep" type="premergeRunner" generateDslJar="true">
   <class name = "PreliminaryMerge">
     <description>
       This plugin allows running builds on merge results before the merge was committed. It helps to detect integration problems.
