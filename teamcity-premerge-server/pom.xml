@@ -40,8 +40,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jetbrains.teamcity</groupId>
-      <artifactId>server-core</artifactId>
+      <groupId>org.jetbrains.teamcity.internal</groupId>
+      <artifactId>server</artifactId>
       <version>${teamcity-version}</version>
       <scope>provided</scope>
     </dependency>
