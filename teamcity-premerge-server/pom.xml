@@ -39,6 +39,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.jetbrains.teamcity</groupId>
+      <artifactId>server-core</artifactId>
+      <version>${teamcity-version}</version>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>

@@ -12,5 +12,6 @@
     <orderEntry type="module" module-name="teamcity-premerge-common" />
     <orderEntry type="module" module-name="server-common-api" />
     <orderEntry type="module" module-name="server-openapi" />
+    <orderEntry type="module" module-name="migration" />
   </component>
 </module>
