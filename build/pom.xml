@@ -4,7 +4,7 @@
   <parent>
     <artifactId>teamcity-premerge</artifactId>
     <groupId>org.jetbrains.teamcity</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>2024.03-SNAPSHOT</version>
   </parent>
   <artifactId>build</artifactId>
   <packaging>pom</packaging>
@@ -18,17 +18,17 @@
       <dependency>
            <groupId>org.jetbrains.teamcity</groupId>
            <artifactId>teamcity-premerge-agent</artifactId>
-           <version>1.0-SNAPSHOT</version>
+           <version>2024.03-SNAPSHOT</version>
       </dependency>
       <dependency>
            <groupId>org.jetbrains.teamcity</groupId>
            <artifactId>teamcity-premerge-common</artifactId>
-           <version>1.0-SNAPSHOT</version>
+           <version>2024.03-SNAPSHOT</version>
       </dependency>
       <dependency>
            <groupId>org.jetbrains.teamcity</groupId>
            <artifactId>teamcity-premerge-server</artifactId>
-           <version>1.0-SNAPSHOT</version>
+           <version>2024.03-SNAPSHOT</version>
       </dependency>
   </dependencies>
   <build>

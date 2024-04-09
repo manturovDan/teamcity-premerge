@@ -17,6 +17,7 @@
 package jetbrains.buildServer.premerge;
 
 import java.io.File;
+import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.oauth.AgentTokenStorage;
 import jetbrains.buildServer.buildTriggers.vcs.git.AuthSettings;
 import jetbrains.buildServer.buildTriggers.vcs.git.GitVersion;
@@ -28,21 +29,27 @@ import jetbrains.buildServer.vcs.VcsRoot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static jetbrains.buildServer.buildTriggers.vcs.git.agent.GitUtilsAgent.detectExtraHTTPCredentialsInBuild;
+
 public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   @NotNull private final AgentGitFacade myFacade;
   @NotNull private final VcsRoot myRoot;
   @NotNull private final AgentPluginConfig myConfig;
   @NotNull protected final PremergeBuildProcess myProcess;
   @NotNull private final AgentGitVcsRoot myVcsRoot;
-  @Nullable private final AgentTokenStorage myTokenStorage;
+  @NotNull private final AgentTokenStorage myTokenStorage;
+
+  @NotNull private final AgentRunningBuild myBuild;
 
   public PremergeBranchSupportImpl(@NotNull PremergeBuildProcess process,
                                    @NotNull VcsRoot root,
                                    @NotNull String repoRelativePath,
-                                   @Nullable AgentTokenStorage tokenStorage) throws VcsException {
+                                   @NotNull AgentTokenStorage tokenStorage,
+                                   @NotNull AgentRunningBuild build) throws VcsException {
     myTokenStorage = tokenStorage;
     myRoot = root;
     myProcess = process;
+    myBuild = build;
     myConfig = createPluginConfig();
     myVcsRoot = createGitVcsRoot(root);
     myFacade = getFacade(repoRelativePath);
@@ -53,7 +60,7 @@ public class PremergeBranchSupportImpl implements PremergeBranchSupport {
   }
 
   protected AgentGitVcsRoot createGitVcsRoot(VcsRoot root) throws VcsException {
-    return new AgentGitVcsRoot(myProcess.getMirrorManager(), myProcess.getBuild().getCheckoutDirectory(), root, myTokenStorage);
+    return new AgentGitVcsRoot(myProcess.getMirrorManager(), myProcess.getBuild().getCheckoutDirectory(), root, myTokenStorage, detectExtraHTTPCredentialsInBuild(myBuild));
   }
 
   protected AgentGitFacade getFacade() {

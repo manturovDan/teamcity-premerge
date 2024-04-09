@@ -4,7 +4,7 @@
   <parent>
     <artifactId>teamcity-premerge</artifactId>
     <groupId>org.jetbrains.teamcity</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>2024.03-SNAPSHOT</version>
   </parent>
   <artifactId>teamcity-premerge-server</artifactId>
   <packaging>jar</packaging>
@@ -13,7 +13,7 @@
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>teamcity-premerge-common</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>2024.03-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
 
@@ -37,6 +37,13 @@
       <artifactId>tests-support</artifactId>
       <version>${teamcity-version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jetbrains.teamcity.internal</groupId>
+      <artifactId>server</artifactId>
+      <version>${teamcity-version}</version>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>

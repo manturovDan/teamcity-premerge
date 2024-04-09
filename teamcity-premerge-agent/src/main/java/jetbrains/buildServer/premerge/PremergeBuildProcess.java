@@ -37,7 +37,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   @NotNull private final MirrorManager myMirrorManager;
   @NotNull private final AgentRunningBuild myBuild;
   @NotNull private final BuildRunnerContext myRunner;
-  @Nullable private final AgentTokenStorage myTokenStorage;
+  @NotNull private final AgentTokenStorage myTokenStorage;
   private String targetBranch;
   private final Map<String, String> targetSHAs = new HashMap<>();
   private ResultStatus status = ResultStatus.SKIPPED;
@@ -123,7 +123,7 @@ public class PremergeBuildProcess extends BuildProcessAdapter {
   }
 
   protected PremergeBranchSupport createPremergeBranchSupport(VcsRoot root, String repoRelativePath) throws VcsException {
-    return new PremergeBranchSupportImpl(this, root, repoRelativePath, myTokenStorage);
+    return new PremergeBranchSupportImpl(this, root, repoRelativePath, myTokenStorage, myBuild);
   }
 
   @NotNull
